@@ -13,7 +13,7 @@ export default function ContentPage() {
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [langDisplayed, setLangDisplayed] = useState(language); // To show which language is being displayed
+  const [langDisplayed, setLangDisplayed] = useState(language);
 
   const languageLabels = { 'en': 'English', 'hi-en': 'Hinglish', 'te-en': 'Teluguish' };
 
@@ -63,11 +63,10 @@ export default function ContentPage() {
     return <div className="flex justify-center items-center min-h-[400px]"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>;
   }
 
-  // Preserve your original error display structure
   if (error || !pageData) {
     return (
-      <div className="max-w-4xl mx-auto py-8"> {/* Added py-8 */}
-        <div className="card text-center p-6"> {/* Added p-6 */}
+      <div className="max-w-4xl mx-auto py-8">
+        <div className="card text-center p-6">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Oops! Content Not Found</h1>
           <p className="text-gray-600 mb-6">{error || `The page content for "${slug}" could not be loaded in the selected language (${languageLabels[language] || language.toUpperCase()}).`}</p>
           <button
@@ -82,17 +81,17 @@ export default function ContentPage() {
   }
   
   return (
-    <article className="max-w-4xl mx-auto py-8"> {/* Added py-8 */}
-      <div className="card p-6 md:p-8"> {/* Added padding, ensure this class 'card' is defined in your styles */}
+    <article className="max-w-4xl mx-auto py-8">
+      <div className="card p-6 md:p-8">
         {pageData && (
           <>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{pageData.title}</h1>
             {langDisplayed !== language && 
-              <p className="text-sm text-yellow-700 bg-yellow-100 p-2 rounded-md mb-4">
+              <p className="text-sm text-yellow-800 bg-yellow-100 p-2 rounded-md mb-4"> {/* Changed text-yellow-700 to text-yellow-800 */}
                 Note: Content for '{languageLabels[language]}' was not found. Displaying in English.
               </p>
             }
-            <div className="prose prose-lg max-w-none"> {/* Make sure @tailwindcss/typography is set up */}
+            <div className="prose prose-lg max-w-none">
               <ReactMarkdown>{pageData.content_markdown}</ReactMarkdown>
             </div>
           </>

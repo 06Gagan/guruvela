@@ -16,7 +16,7 @@ export default function RankPredictorPage() {
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
 
-  const preparatoryGuideLink = "/pages/iit-preparatory-courses-guide"; // Links to English version by slug
+  const preparatoryGuideLink = "/pages/iit-preparatory-courses-guide";
 
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
   const quotaOptions = { 'JEE Main': ["AI", "HS", "OS", "GO"], 'JEE Advanced': ["AI"] };
@@ -25,7 +25,7 @@ export default function RankPredictorPage() {
   useEffect(() => {
     if (examType === 'JEE Advanced') setQuota('AI');
     else if (!quotaOptions['JEE Main'].includes(quota)) setQuota('AI'); 
-  }, [examType, quota]); // Added quota to dependency array
+  }, [examType, quota]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ export default function RankPredictorPage() {
       
       let query = supabase.from('college_cutoffs')
         .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, is_preparatory, id, exam_type')
-        .eq('year', 2024) // Assuming fixed year and round for this example
+        .eq('year', 2024)
         .eq('round_no', 6)
         .eq('exam_type', examType)
         .eq('seat_type', category);
@@ -68,7 +68,8 @@ export default function RankPredictorPage() {
       </div>
       <h1 className="text-3xl font-bold text-primary mb-8 text-center">Guruvela - JoSAA College Predictor</h1>
       <p className="text-center text-gray-600 mb-6">Find potential colleges based on JoSAA cutoffs.</p>
-      <form onSubmit={handleSubmit} className="card mb-8 p-6 space-y-4 bg-white rounded-lg shadow-lg">
+      {/* Updated to use the .card class from index.css */}
+      <form onSubmit={handleSubmit} className="card mb-8 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div>
             <label htmlFor="rank" className="block text-sm font-medium text-gray-700 mb-1">Your Rank:</label>
@@ -114,7 +115,7 @@ export default function RankPredictorPage() {
           </button>
         </div>
       </form>
-      {/* Result display logic from your original file */}
+      
       {isLoading && <div className="text-center py-4">Loading...</div>}
       {error && <p className="text-center text-red-500 py-4">Error: {error}</p>}
       {searched && !isLoading && results.length === 0 && !error && (
@@ -123,7 +124,7 @@ export default function RankPredictorPage() {
       {!isLoading && results.length > 0 && (
         <div className="overflow-x-auto shadow-xl rounded-lg mt-8">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4 p-4 bg-gray-100 rounded-t-lg">
-            Potential Colleges (JoSAA Data): {/* Simplified title */}
+            Potential Colleges (JoSAA Data):
           </h2>
           <table className="min-w-full divide-y divide-gray-300">
             <thead className="bg-gray-200">

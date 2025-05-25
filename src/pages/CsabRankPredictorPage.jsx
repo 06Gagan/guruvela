@@ -1,14 +1,13 @@
 // src/pages/CsabRankPredictorPage.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Keep for any internal links if needed
+import { Link } from 'react-router-dom'; 
 import { supabase } from '../lib/supabase';
 
 export default function CsabRankPredictorPage() {
   const [rank, setRank] = useState('');
-  // Exam Type is fixed to JEE Main for CSAB, so no state needed for it if not selectable
-  const [category, setCategory] = useState('OPEN'); // Default category
-  const [quota, setQuota] = useState('AI'); // Default quota
-  const [gender, setGender] = useState('Gender-Neutral'); // Default gender
+  const [category, setCategory] = useState('OPEN');
+  const [quota, setQuota] = useState('AI');
+  const [gender, setGender] = useState('Gender-Neutral');
   
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,15 +22,12 @@ export default function CsabRankPredictorPage() {
     "ST", "ST (PwD)"
   ];
 
-  // Quota options are still relevant for NIT+ system in CSAB
-  const quotaOptions = ["AI", "HS", "OS", "GO"]; // Common quotas, adjust if CSAB uses a different set
+  const quotaOptions = ["AI", "HS", "OS", "GO"]; 
   
   const genderOptions = [
     "Gender-Neutral",
     "Female-only (including Supernumerary)"
   ];
-
-  // No useEffect for examType/quota interaction if examType is fixed
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,16 +49,14 @@ export default function CsabRankPredictorPage() {
         throw new Error("Invalid rank entered. Please enter a positive number.");
       }
 
-      // Querying the new 'csab_college_cutoffs' table
       let query = supabase
-        .from('csab_college_cutoffs') // Changed to new CSAB table
-        .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, id') // is_preparatory removed
-        .eq('year', 2024) // Fixed year for CSAB 2024 data
-        .eq('round_no', 2) // Fixed round_no for CSAB Special Round 2
-        // exam_type is implicitly 'JEE Main' as per table design
+        .from('csab_college_cutoffs')
+        .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, id')
+        .eq('year', 2024) 
+        .eq('round_no', 2) 
         .eq('seat_type', category);
 
-      if (quota) { // Quota is applicable for NIT+ system
+      if (quota) {
         query = query.eq('quota', quota);
       }
       
@@ -70,10 +64,8 @@ export default function CsabRankPredictorPage() {
         query = query.eq('gender', gender);
       }
       
-      // Eligibility Logic: user's rank is better than or equal to the closing rank.
-      query = query.gte('closing_rank', userRankInt); // closing_rank_in_db >= user_rank
+      query = query.gte('closing_rank', userRankInt);
             
-      // Order results by closing_rank in ASCENDING order.
       query = query.order('closing_rank', { ascending: true }).limit(100); 
 
       const { data: fetchedData, error: supabaseError } = await query;
@@ -104,8 +96,9 @@ export default function CsabRankPredictorPage() {
         Find potential colleges based on CSAB Special Round 2 (2024) cutoffs (JEE Main Ranks).
       </p>
 
-      <form onSubmit={handleSubmit} className="card mb-8 p-6 space-y-4 bg-white rounded-lg shadow-lg">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6"> {/* Adjusted grid for fewer filters */}
+      {/* Updated to use the .card class from index.css */}
+      <form onSubmit={handleSubmit} className="card mb-8 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
           <div>
             <label htmlFor="rank" className="block text-sm font-medium text-gray-700 mb-1">
               Your JEE Main CRL Rank:
@@ -120,7 +113,6 @@ export default function CsabRankPredictorPage() {
               className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2"
             />
           </div>
-          {/* Exam Type is fixed for CSAB - Not shown as a selectable filter */}
            <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Exam Type:
@@ -173,7 +165,6 @@ export default function CsabRankPredictorPage() {
               {genderOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
-           {/* Preparatory Rank checkbox removed as it's not applicable for CSAB Special Rounds */}
         </div>
         <div className="text-center pt-4">
           <button 
@@ -223,7 +214,6 @@ export default function CsabRankPredictorPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{item.gender}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                     {item.closing_rank}
-                    {/* is_preparatory link removed as it's not in the csab_college_cutoffs table */}
                   </td>
                 </tr>
               ))}
