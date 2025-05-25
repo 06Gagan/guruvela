@@ -69,6 +69,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const { language } = useLanguage(); // 'en', 'hi-en', or 'te-en'
   const chatEndRef = useRef(null);
+  const [showGuide, setShowGuide] = useState(true); // State to control guide visibility
 
   const [currentCategories, setCurrentCategories] = useState([]);
   const [currentUiText, setCurrentUiText] = useState(uiTranslations.en);
@@ -179,7 +180,6 @@ export default function ChatInterface() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* This is your original card structure from the uploaded file */}
       <div className="card h-[calc(100vh-200px)] sm:h-[600px] flex flex-col">
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
           {chatHistory.map((msg, index) => (
@@ -199,10 +199,9 @@ export default function ChatInterface() {
                         <button
                           key={suggestion.id} // Ensure category objects from initialCategoriesBase have unique 'id'
                           onClick={() => handleSubmit(null, suggestion.exampleQuery)}
-                          // Using your existing button classes from original file
-                          className="btn-primary text-sm py-1 px-3 bg-accent-alt hover:bg-emerald-600" 
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm"
                         >
-                          {suggestion.label} 
+                          {suggestion.label}
                         </button>
                       ))}
                     </div>
@@ -212,35 +211,17 @@ export default function ChatInterface() {
             </div>
           ))}
           <div ref={chatEndRef} />
-          {isLoading && ( 
-            <div className="flex justify-start">
-              <div className="bg-gray-100 rounded-lg p-4">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-200"></div>
-                </div>
-              </div>
-            </div>
-           )}
         </div>
-
-        {/* Using your existing form structure from original file */}
-        <form onSubmit={handleSubmit} className="border-t p-4 bg-gray-50">
-           <div className="flex gap-2">
+        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200">
+          <div className="flex space-x-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={currentUiText.askPlaceholder}
-              className="flex-grow rounded-lg border border-gray-300 px-4 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              disabled={isLoading}
+              className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <button 
-              type="submit" 
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading}
-            >
+            <button type="submit" className="btn-primary px-4 py-2" disabled={isLoading}>
               {isLoading ? currentUiText.sending : currentUiText.send}
             </button>
           </div>

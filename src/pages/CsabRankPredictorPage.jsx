@@ -94,6 +94,9 @@ export default function CsabRankPredictorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-start mb-4">
+        <Link to="/" className="btn-primary">Back to Home</Link>
+      </div>
       <h1 className="text-3xl font-bold text-primary mb-8 text-center">
         Guruvela - CSAB College Predictor
       </h1>

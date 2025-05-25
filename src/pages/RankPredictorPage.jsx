@@ -63,6 +63,9 @@ export default function RankPredictorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-start mb-4">
+        <Link to="/" className="btn-primary">Back to Home</Link>
+      </div>
       <h1 className="text-3xl font-bold text-primary mb-8 text-center">Guruvela - JoSAA College Predictor</h1>
       <p className="text-center text-gray-600 mb-6">Find potential colleges based on JoSAA cutoffs.</p>
       <form onSubmit={handleSubmit} className="card mb-8 p-6 space-y-4 bg-white rounded-lg shadow-lg">
