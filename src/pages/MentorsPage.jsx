@@ -9,21 +9,27 @@ export default function MentorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // IMPORTANT: Replace these placeholder URLs with your actual links
-    // === ACTION REQUIRED: Replace these placeholder URLs with your actual links ===
-  const GENERAL_GROUP_LINK = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; // Example: Replace with your actual WhatsApp group link
-  const PREMIUM_GUIDANCE_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; // Example: Replace with your actual Premium Guidance form link
+  // === Example Links: Replace these with your actual URLs ===
+  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; // Example WhatsApp group link
+  const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; // Example Google Form link
+  // =================================================================
+
+  // These are just for the conditional styling to know if a *real* link has been set above
+  const GENERAL_GROUP_LINK_PLACEHOLDER = "YOUR_GENERAL_GROUP_LINK_HERE";
+  const PREMIUM_GUIDANCE_LINK_PLACEHOLDER = "YOUR_PREMIUM_GUIDANCE_LINK_HERE";
+
 
   useEffect(() => {
     const fetchMentors = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Removed 'premium_guidance_link' from select
-        // Also ensure 'introduction' is selected here if you added it to your table and MentorCard.jsx
+        // Ensure your select statement matches the columns in your 'mentors' table
+        // If you excluded 'introduction' or per-mentor 'group_guidance_link'/'premium_guidance_link' 
+        // from your SQL table, remove them from this select statement.
         const { data, error: supabaseError } = await supabase
           .from('mentors')
-          .select('id, name, profile_image_path, branch, state, google_form_link_1_to_1, group_guidance_link') 
+          .select('id, name, profile_image_path, branch, state, introduction, google_form_link_1_to_1, group_guidance_link, premium_guidance_link') 
           .eq('active', true)
           .order('sort_order', { ascending: true });
 
@@ -61,6 +67,10 @@ export default function MentorsPage() {
     );
   }
 
+  // Determine if the links are still placeholders (for styling purposes)
+  const isGeneralLinkPlaceholder = actualGeneralGroupLink === GENERAL_GROUP_LINK_PLACEHOLDER;
+  const isPremiumLinkPlaceholder = actualPremiumGuidanceLink === PREMIUM_GUIDANCE_LINK_PLACEHOLDER;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-start mb-6">
@@ -91,11 +101,12 @@ export default function MentorsPage() {
         <p className="text-gray-700 mb-3">
           For general guidance in a group setting, you can join our community group: 
           <a 
-            href={GENERAL_GROUP_LINK}
+            href={isGeneralLinkPlaceholder ? "#" : actualGeneralGroupLink}
             target="_blank" 
             rel="noopener noreferrer" 
-            className={`ml-1 font-semibold ${GENERAL_GROUP_LINK === 'YOUR_GENERAL_GROUP_LINK_HERE' ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
-            aria-disabled={GENERAL_GROUP_LINK === 'https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw'}
+            className={`ml-1 font-semibold ${isGeneralLinkPlaceholder ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
+            aria-disabled={isGeneralLinkPlaceholder}
+            onClick={(e) => isGeneralLinkPlaceholder && e.preventDefault()}
           >
             Join Community Group
           </a>
@@ -103,11 +114,12 @@ export default function MentorsPage() {
         <p className="text-gray-700">
           Need more dedicated support, such as early WhatsApp replies or direct calls?
           <a 
-            href={PREMIUM_GUIDANCE_LINK}
+            href={isPremiumLinkPlaceholder ? "#" : actualPremiumGuidanceLink}
             target="_blank" 
             rel="noopener noreferrer" 
-            className={`ml-1 font-semibold ${PREMIUM_GUIDANCE_LINK === 'YOUR_PREMIUM_GUIDANCE_LINK_HERE' ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
-            aria-disabled={PREMIUM_GUIDANCE_LINK === 'YOUR_PREMIUM_GUIDANCE_LINK_HERE'}
+            className={`ml-1 font-semibold ${isPremiumLinkPlaceholder ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
+            aria-disabled={isPremiumLinkPlaceholder}
+            onClick={(e) => isPremiumLinkPlaceholder && e.preventDefault()}
           >
             Explore Premium Guidance
           </a>
