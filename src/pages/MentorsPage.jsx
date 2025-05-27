@@ -1,32 +1,24 @@
-// src/pages/MentorsPage.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import MentorCard from '../components/Mentors/mentorcard'; 
+import MentorCard from '../components/Mentors/MentorCard'; 
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // === Example Links: Replace these with your actual URLs ===
-  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; // Example WhatsApp group link
-  const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; // Example Google Form link
-  // =================================================================
+  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; 
+  const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; 
 
-  // These are just for the conditional styling to know if a *real* link has been set above
   const GENERAL_GROUP_LINK_PLACEHOLDER = "YOUR_GENERAL_GROUP_LINK_HERE";
   const PREMIUM_GUIDANCE_LINK_PLACEHOLDER = "YOUR_PREMIUM_GUIDANCE_LINK_HERE";
-
 
   useEffect(() => {
     const fetchMentors = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Ensure your select statement matches the columns in your 'mentors' table
-        // If you excluded 'introduction' or per-mentor 'group_guidance_link'/'premium_guidance_link' 
-        // from your SQL table, remove them from this select statement.
         const { data, error: supabaseError } = await supabase
           .from('mentors')
           .select('id, name, profile_image_path, branch, state, introduction, google_form_link_1_to_1, group_guidance_link, premium_guidance_link') 
@@ -67,9 +59,8 @@ export default function MentorsPage() {
     );
   }
 
-  // Determine if the links are still placeholders (for styling purposes)
-  const isGeneralLinkPlaceholder = actualGeneralGroupLink === GENERAL_GROUP_LINK_PLACEHOLDER;
-  const isPremiumLinkPlaceholder = actualPremiumGuidanceLink === PREMIUM_GUIDANCE_LINK_PLACEHOLDER;
+  const isGeneralLinkPlaceholder = actualGeneralGroupLink === "YOUR_ACTUAL_WHATSAPP_GROUP_INVITE_LINK_HERE" || actualGeneralGroupLink === GENERAL_GROUP_LINK_PLACEHOLDER;
+  const isPremiumLinkPlaceholder = actualPremiumGuidanceLink === "YOUR_ACTUAL_GOOGLE_FORM_LINK_FOR_PREMIUM_GUIDANCE_HERE" || actualPremiumGuidanceLink === PREMIUM_GUIDANCE_LINK_PLACEHOLDER;
 
   return (
     <div className="container mx-auto px-4 py-8">
