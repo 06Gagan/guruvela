@@ -11,7 +11,7 @@ export default function MentorsPage() {
 
   // IMPORTANT: Replace these placeholder URLs with your actual links
     // === ACTION REQUIRED: Replace these placeholder URLs with your actual links ===
-  const GENERAL_GROUP_LINK = "https://chat.whatsapp.com/YOUR_GROUP_ID"; // Example: Replace with your actual WhatsApp group link
+  const GENERAL_GROUP_LINK = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; // Example: Replace with your actual WhatsApp group link
   const PREMIUM_GUIDANCE_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; // Example: Replace with your actual Premium Guidance form link
 
   useEffect(() => {
