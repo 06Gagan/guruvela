@@ -7,16 +7,24 @@ export default function MentorCard({ mentor }) {
     profile_image_path,
     branch,
     state,
-    introduction, // Include this if you added it to your SQL table and select it in MentorsPage.jsx
+    introduction, // Ensure this is selected in MentorsPage.jsx if you are using it
     google_form_link_1_to_1
   } = mentor;
 
+  // 1. VERIFY THIS: Is VITE_SUPABASE_URL in your .env file correct?
+  //    It should be like: VITE_SUPABASE_URL=https://acaoqrybztxymacdzyzf.supabase.co (NO trailing slash)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const publicBucketName = 'profilepic'; // Ensure this matches your bucket name
+
+  // 2. VERIFY THIS: Does this EXACTLY match the name of your Supabase Storage bucket?
+  //    Based on your example URL, it seems to be 'profilepic'.
+  const publicBucketName = 'profilepic'; 
 
   const imageUrl = profile_image_path
     ? `${supabaseUrl}/storage/v1/object/public/${publicBucketName}/${profile_image_path}`
     : 'https://via.placeholder.com/150'; 
+
+  // For debugging, you can log the generated URL:
+  // console.log(`Generated imageUrl for ${name}: ${imageUrl}`);
 
   return (
     <div className="card flex flex-col items-center text-center p-6 transform transition-all duration-300 hover:shadow-xl hover:scale-105 h-full">
@@ -25,6 +33,7 @@ export default function MentorCard({ mentor }) {
         alt={`Profile of ${name}`}
         className="w-32 h-32 rounded-full object-cover mb-4 shadow-md border-2 border-gray-200"
         onError={(e) => { 
+          console.error(`Error loading image for ${name}: ${imageUrl}`);
           e.target.onerror = null; 
           e.target.src = 'https://via.placeholder.com/150'; 
         }}

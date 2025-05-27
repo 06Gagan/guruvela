@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import MentorCard from '../components/Mentors/MentorCard'; 
+import MentorCard from '../components/Mentors/mentorcard'; 
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState([]);
@@ -94,7 +94,7 @@ export default function MentorsPage() {
             target="_blank" 
             rel="noopener noreferrer" 
             className={`ml-1 font-semibold ${GENERAL_GROUP_LINK === 'YOUR_GENERAL_GROUP_LINK_HERE' ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
-            aria-disabled={GENERAL_GROUP_LINK === 'YOUR_GENERAL_GROUP_LINK_HERE'}
+            aria-disabled={GENERAL_GROUP_LINK === 'https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw'}
           >
             Join Community Group
           </a>
@@ -105,8 +105,8 @@ export default function MentorsPage() {
             href={PREMIUM_GUIDANCE_LINK}
             target="_blank" 
             rel="noopener noreferrer" 
-            className={`ml-1 font-semibold ${PREMIUM_GUIDANCE_LINK === 'YOUR_PREMIUM_GUIDANCE_LINK_HERE' ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
-            aria-disabled={PREMIUM_GUIDANCE_LINK === 'YOUR_PREMIUM_GUIDANCE_LINK_HERE'}
+            className={`ml-1 font-semibold ${PREMIUM_GUIDANCE_LINK === 'https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform' ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
+            aria-disabled={PREMIUM_GUIDANCE_LINK === 'https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform'}
           >
             Explore Premium Guidance
           </a>
