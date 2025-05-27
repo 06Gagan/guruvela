@@ -100,6 +100,9 @@ export default function Header() {
                 )}
               </div>
 
+              {/* Add new Mentors link here */}
+              <Link to="/mentors" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>Mentors</Link>
+
               <Link to="/pages/about-us" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>About</Link>
               <Link to="/pages/how-to-use" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>How to Use</Link>
               <Link to="/faqs" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>FAQ & Guides</Link>

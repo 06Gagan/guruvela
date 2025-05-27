@@ -5,7 +5,8 @@ import ChatInterface from './components/Chatbot/ChatInterface';
 import ContentPage from './pages/ContentPage';
 import FAQListPage from './pages/FAQListPage'; 
 import RankPredictorPage from './pages/RankPredictorPage';
-import CsabRankPredictorPage from './pages/CsabRankPredictorPage'; // Assuming this is your separate CSAB page
+import CsabRankPredictorPage from './pages/CsabRankPredictorPage';
+import MentorsPage from './pages/MentorsPage'; // Import the new page
 import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="faqs" element={<FAQListPage />} /> 
             <Route path="rank-predictor" element={<RankPredictorPage />} />
             <Route path="csab-predictor" element={<CsabRankPredictorPage />} />
+            <Route path="mentors" element={<MentorsPage />} /> {/* Add this new route */}
           </Route>
         </Routes>
       </Router>
