@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import MentorCard from '../components/Mentors/mentorcard'; 
+import MentorCard from '../components/Mentors/MentorCard'; 
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState([]);
