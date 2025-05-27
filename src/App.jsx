@@ -8,7 +8,7 @@ import RankPredictorPage from './pages/RankPredictorPage';
 import CsabRankPredictorPage from './pages/CsabRankPredictorPage';
 import MentorsPage from './pages/MentorsPage'; // Import the new page
 import { LanguageProvider } from './contexts/LanguageContext';
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   return (
