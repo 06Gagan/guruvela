@@ -1,30 +1,26 @@
 // src/components/Mentors/MentorCard.jsx
 import React from 'react';
 
-export default function MentorCard({ mentor }) {
+export default function MentorCard({ mentor, fallbackGroupLink }) { // Added fallbackGroupLink
   const {
     name,
-    profile_image_path,
+    profile_image_path, 
     branch,
     state,
-    introduction, // Ensure this is selected in MentorsPage.jsx if you are using it
-    google_form_link_1_to_1
+    google_form_link_1_to_1,
+    group_guidance_link // This now comes from the mentor object
   } = mentor;
 
-  // 1. VERIFY THIS: Is VITE_SUPABASE_URL in your .env file correct?
-  //    It should be like: VITE_SUPABASE_URL=https://acaoqrybztxymacdzyzf.supabase.co (NO trailing slash)
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-
-  // 2. VERIFY THIS: Does this EXACTLY match the name of your Supabase Storage bucket?
-  //    Based on your example URL, it seems to be 'profilepic'.
   const publicBucketName = 'profilepic'; 
 
-  const imageUrl = profile_image_path
-    ? `${supabaseUrl}/storage/v1/object/public/${publicBucketName}/${profile_image_path}`
+  const imageUrl = profile_image_path 
+    ? `${supabaseUrl}/storage/v1/object/public/${publicBucketName}/${profile_image_path.startsWith('/') ? profile_image_path.substring(1) : profile_image_path}`
     : 'https://via.placeholder.com/150'; 
 
-  // For debugging, you can log the generated URL:
-  // console.log(`Generated imageUrl for ${name}: ${imageUrl}`);
+  const actualGroupLink = group_guidance_link || fallbackGroupLink;
+  const isGroupLinkPlaceholder = actualGroupLink === "YOUR_FALLBACK_WHATSAPP_GROUP_LINK_HERE" || !actualGroupLink;
+
 
   return (
     <div className="card flex flex-col items-center text-center p-6 transform transition-all duration-300 hover:shadow-xl hover:scale-105 h-full">
@@ -42,30 +38,38 @@ export default function MentorCard({ mentor }) {
       {branch && <p className="text-primary font-semibold mb-1">{branch}</p>}
       {state && <p className="text-gray-600 text-sm mb-3">{state}</p>}
       
-      {introduction && (
-        <p className="text-gray-500 text-sm mb-4 flex-grow min-h-[60px] max-h-24 overflow-y-auto px-2">
-          {introduction}
-        </p>
-      )}
+      {/* Introduction section removed as per your SQL */}
 
-      <div className="mt-auto w-full pt-4">
+      <div className="mt-auto w-full pt-4 space-y-2">
         {google_form_link_1_to_1 ? (
           <a
             href={google_form_link_1_to_1}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary w-full"
+            className="btn-primary w-full block" // Added block for better layout if multiple buttons
           >
             1-to-1 Mentorship
           </a>
         ) : (
           <button
-            className="btn-primary w-full opacity-50 cursor-not-allowed"
+            className="btn-primary w-full block opacity-50 cursor-not-allowed"
             disabled
           >
             1-to-1 (Not Available)
           </button>
         )}
+
+        {/* Per-mentor group guidance link */}
+        <a 
+          href={isGroupLinkPlaceholder ? "#" : actualGroupLink}
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className={`btn-accent w-full block ${isGroupLinkPlaceholder ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-600'}`}
+          aria-disabled={isGroupLinkPlaceholder}
+          onClick={(e) => isGroupLinkPlaceholder && e.preventDefault()}
+        >
+          Join Group Guidance
+        </a>
       </div>
     </div>
   );
