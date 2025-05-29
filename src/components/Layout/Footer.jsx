@@ -11,7 +11,7 @@ export default function Footer() {
             Your trusted guide for JOSAA, CSAB, and all things related to engineering admissions in India.
           </p>
           <div className="flex justify-center space-x-4 mb-4 text-sm">
-            <Link to="/pages/about-us" className="text-gray-600 hover:text-primary transition-colors">About Us</Link>
+            <Link to="/about-us" className="text-gray-600 hover:text-primary transition-colors">About Us</Link>
             <Link to="/faqs" className="text-gray-600 hover:text-primary transition-colors">FAQ & Guides</Link>
             {/* Placeholder Links - replace '#' with actual paths when ready */}
             <Link to="#" className="text-gray-600 hover:text-primary transition-colors">Privacy Policy</Link>

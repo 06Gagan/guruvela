@@ -6,8 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function ContentPage() {
-  const { slug } = useParams(); // This 'slug' will be 'about-us', 'how-to-use', etc.
-  const { language } = useLanguage(); 
+  const { slug } = useParams();
+  const { language } = useLanguage();
   const navigate = useNavigate();
 
   const [pageData, setPageData] = useState(null);
@@ -19,56 +19,92 @@ export default function ContentPage() {
 
   useEffect(() => {
     const fetchContent = async () => {
+      console.log(`ContentPage: useEffect triggered for slug: '${slug}', language from context: '${language}'`);
       if (!slug) {
-        setError('Page identifier is missing.'); 
-        setLoading(false); 
+        setError('Page slug is missing.');
+        setLoading(false);
+        console.error("ContentPage: Slug is missing.");
         return;
       }
-      setLoading(true); 
-      setError(null); 
+      
+      setLoading(true);
+      setError(null);
       setPageData(null);
       let currentLangToFetch = language;
       setDisplayLanguage(language);
+      console.log(`ContentPage: Attempting to fetch content for slug: '${slug}', language: '${currentLangToFetch}' from 'content_pages' table.`);
 
       try {
         let { data, error: supabaseError } = await supabase
-          .from('static_page_content') // Fetching from the new table
-          .select('title, content_markdown, language_code') 
-          .eq('page_identifier', slug) // Using slug from URL as page_identifier
-          .eq('language_code', currentLangToFetch) 
-          .single();
+          .from('content_pages')
+          .select('title, content_markdown, language, page_type')
+          .eq('slug', slug)
+          .eq('language', currentLangToFetch);
 
-        if (supabaseError || !data) {
-          if (currentLangToFetch !== 'en') {
-            console.warn(`Content for page '${slug}' in '${currentLangToFetch}' not found. Trying English fallback.`);
-            setDisplayLanguage('en'); 
-            let { data: fallbackData, error: fallbackError } = await supabase
-              .from('static_page_content')
-              .select('title, content_markdown, language_code')
-              .eq('page_identifier', slug)
-              .eq('language_code', 'en')
-              .single();
-            
-            if (fallbackError || !fallbackData) {
-              throw new Error(fallbackError?.message || `Page "${slug}" content not found in English.`);
-            }
-            setPageData(fallbackData);
-          } else { 
-            throw new Error(supabaseError?.message || `Page "${slug}" content not found.`);
-          }
-        } else {
-         setPageData(data);
-         setDisplayLanguage(data.language_code); 
+        console.log(`ContentPage: Initial fetch for '${currentLangToFetch}' - SupabaseError:`, supabaseError, `Data:`, data);
+
+        let foundContent = null;
+
+        if (supabaseError) {
+          console.error(`ContentPage: Supabase error on initial fetch for '${currentLangToFetch}':`, supabaseError.message);
+        } else if (data && data.length === 1) {
+          foundContent = data[0];
+          console.log(`ContentPage: Found one entry for slug '${slug}' in '${currentLangToFetch}'.`);
+        } else if (data && data.length > 1) {
+          console.warn(`ContentPage: Found multiple entries (${data.length}) for slug '${slug}' in '${currentLangToFetch}'. Using the first one.`);
+          foundContent = data[0]; 
         }
+        
+        if ((!foundContent || supabaseError) && currentLangToFetch !== 'en') {
+          console.warn(`ContentPage: Content for slug '${slug}' in '${currentLangToFetch}' not definitively found or error occurred. Trying English fallback for 'content_pages'.`);
+          
+          let { data: fallbackData, error: fallbackError } = await supabase
+            .from('content_pages')
+            .select('title, content_markdown, language, page_type')
+            .eq('slug', slug)
+            .eq('language', 'en');
+
+          console.log(`ContentPage: English fallback fetch from 'content_pages' - FallbackError:`, fallbackError, `FallbackData:`, fallbackData);
+
+          if (fallbackError) {
+            console.error(`ContentPage: Supabase error on English fallback fetch:`, fallbackError.message);
+            throw new Error(fallbackError.message || `Page "${slug}" content (from content_pages) encountered an error during English fallback.`);
+          } else if (fallbackData && fallbackData.length === 1) {
+            foundContent = fallbackData[0];
+            setDisplayLanguage('en');
+            console.log(`ContentPage: Found one entry for slug '${slug}' in English (fallback from content_pages).`);
+          } else if (fallbackData && fallbackData.length > 1) {
+            console.warn(`ContentPage: Found multiple entries (${fallbackData.length}) for slug '${slug}' in English (fallback from content_pages). Using the first one.`);
+            foundContent = fallbackData[0];
+            setDisplayLanguage('en');
+          } else {
+            throw new Error(`Page "${slug}" content not found in selected language or in English (from content_pages).`);
+          }
+        } else if (!foundContent && currentLangToFetch === 'en') {
+           throw new Error(supabaseError?.message || `Page "${slug}" content not found in English (from content_pages).`);
+        }
+
+        if (foundContent) {
+          setPageData(foundContent);
+          setDisplayLanguage(foundContent.language);
+          console.log(`ContentPage: Successfully set pageData for language: ${foundContent.language}`);
+        } else if (!supabaseError) { 
+          throw new Error(`Page "${slug}" content could not be loaded for language '${currentLangToFetch}' (from content_pages).`);
+        }
+
       } catch (err) {
-        console.error(`Error fetching content for page '${slug}', language: ${currentLangToFetch}`, err);
+        console.error(`ContentPage: Final error in fetchContent for slug: '${slug}', language: '${currentLangToFetch}' - Message: ${err.message}`, err);
         setError(err.message);
       } finally {
         setLoading(false);
+        console.log(`ContentPage: fetchContent (content_pages) finished. Loading: false.`);
       }
     };
+
     fetchContent();
   }, [slug, language]);
+
+  console.log(`ContentPage: Rendering component - Slug: ${slug}, Loading: ${loading}, Error: ${error}, PageData:`, pageData);
 
   if (loading) {
     return (

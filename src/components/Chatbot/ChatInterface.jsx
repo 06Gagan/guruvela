@@ -226,37 +226,63 @@ export default function ChatInterface() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="card h-[calc(100vh-200px)] sm:h-[600px] flex flex-col">
-        <div className="flex-grow overflow-y-auto p-4 space-y-4">
+        <div 
+          className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+          role="log"
+          aria-label="Chat messages"
+        >
           {chatHistory.map((msg, index) => (
-            <div key={index} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] rounded-lg p-3 shadow-sm ${msg.type === 'user' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-800'}`}>
-                <p className="whitespace-pre-wrap">{msg.content}</p>
+            <div 
+              key={index} 
+              className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              role={msg.type === 'user' ? 'user-message' : 'bot-message'}
+            >
+              <div 
+                className={`max-w-[80%] rounded-lg p-4 shadow-sm transition-all duration-200
+                  ${msg.type === 'user' 
+                    ? 'bg-primary text-white hover:shadow-md' 
+                    : 'bg-gray-50 text-gray-800 hover:shadow-md border border-gray-100'}`}
+              >
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                
                 {msg.type === 'bot' && msg.relatedContent && (
                   <Link 
                     to={getLearnMoreLinkPath(msg.relatedContent)} 
-                    className="mt-2 inline-block text-sm text-accent hover:underline"
+                    className="mt-3 inline-flex items-center text-sm text-accent hover:text-accent-dark transition-colors duration-150"
                   >
                     {currentUiText.learnMore}
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
                   </Link>
                 )}
+
                 {msg.type === 'bot' && msg.showHowToUseSuggestion && (
-                  <p className="mt-2 text-sm text-gray-600">
+                  <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
                     {currentUiText.howToUseReferralPrefix}
-                    <Link to="/how-to-use" className="text-accent hover:underline font-semibold">
+                    <Link 
+                      to="/how-to-use" 
+                      className="text-accent hover:text-accent-dark font-medium hover:underline transition-colors duration-150"
+                    >
                       {currentUiText.howToUseReferralLinkText}
                     </Link>
                     {currentUiText.howToUseReferralSuffix}
-                  </p>
+                  </div>
                 )}
-                {msg.type === 'bot' && msg.suggestions && msg.suggestions.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm font-semibold mb-2 text-gray-700">{currentUiText.chooseTopic}</p>
+
+                {msg.type === 'bot' && msg.suggestions && (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm text-gray-600 font-medium">{currentUiText.chooseTopic}</p>
                     <div className="flex flex-wrap gap-2">
                       {msg.suggestions.map((suggestion) => (
                         <button
                           key={suggestion.id}
                           onClick={() => handleSubmit(null, suggestion.exampleQuery)}
-                          className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded-full text-sm"
+                          className="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-full 
+                                   text-gray-700 hover:bg-gray-50 hover:border-gray-300 
+                                   focus:outline-none focus:ring-2 focus:ring-primary/50 
+                                   transition-all duration-200"
+                          disabled={isLoading}
                         >
                           {suggestion.label}
                         </button>
@@ -269,20 +295,44 @@ export default function ChatInterface() {
           ))}
           <div ref={chatEndRef} />
         </div>
-        <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200">
-          <div className="flex space-x-2">
+
+        <div className="border-t border-gray-200 p-4 bg-white">
+          <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={currentUiText.askPlaceholder}
-              className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-grow form-input"
+              disabled={isLoading}
+              aria-label="Type your message"
             />
-            <button type="submit" className="btn-primary px-4 py-2" disabled={isLoading}>
-              {isLoading ? currentUiText.sending : currentUiText.send}
+            <button
+              type="submit"
+              disabled={!message.trim() || isLoading}
+              className={`btn-primary flex items-center gap-2 min-w-[100px] justify-center
+                ${(!message.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              aria-label={isLoading ? "Sending message..." : "Send message"}
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>{currentUiText.sending}</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  <span>{currentUiText.send}</span>
+                </>
+              )}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
