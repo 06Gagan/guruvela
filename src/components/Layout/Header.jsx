@@ -89,7 +89,7 @@ export default function Header() {
                   onClick={() => setIsPredictorDropdownOpen(prev => !prev)}
                   className="w-full text-left md:text-center text-gray-600 hover:text-primary focus:outline-none py-2 px-1 md:px-2 rounded flex items-center justify-between md:justify-start transition-colors duration-150"
                 >
-                  Rank Predictor
+                  College Predictor
                   <svg className={`w-4 h-4 inline-block ml-1 transition-transform duration-200 ${isPredictorDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
                 {isPredictorDropdownOpen && (
