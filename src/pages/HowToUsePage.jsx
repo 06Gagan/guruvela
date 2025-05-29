@@ -24,12 +24,12 @@ export default function HowToUsePage() {
       setPageTitle('');
       setPageMarkdown('');
       let currentLangToFetch = language;
-      setDisplayLanguage(language); // Optimistically set display language
+      setDisplayLanguage(language); 
 
       try {
         // Attempt to fetch content in the selected language
         let { data, error: supabaseError } = await supabase
-          .from('how_to_use_page_translations') // Using the specific table name
+          .from('how_to_use_page_translations') 
           .select('title, content_markdown, language_code')
           .eq('language_code', currentLangToFetch)
           .single();
@@ -38,7 +38,7 @@ export default function HowToUsePage() {
           // If not found and current language is not English, try English fallback
           if (currentLangToFetch !== 'en') {
             console.warn(`"How to Use" content in '${currentLangToFetch}' not found. Trying English fallback.`);
-            setDisplayLanguage('en'); // Set display language to English to show the notice correctly
+            setDisplayLanguage('en'); 
             let { data: fallbackData, error: fallbackError } = await supabase
               .from('how_to_use_page_translations')
               .select('title, content_markdown, language_code')
@@ -60,7 +60,7 @@ export default function HowToUsePage() {
           // Content found in the selected language
           setPageTitle(data.title);
           setPageMarkdown(data.content_markdown);
-          setDisplayLanguage(data.language_code); // Confirm display language
+          setDisplayLanguage(data.language_code); 
         }
       } catch (err) {
         console.error(`Error fetching "How to Use" content for language: ${currentLangToFetch}`, err);
@@ -71,7 +71,7 @@ export default function HowToUsePage() {
     };
 
     fetchContent();
-  }, [language]); // Re-fetch when language changes
+  }, [language]); 
 
   if (loading) {
     return (
@@ -85,8 +85,8 @@ export default function HowToUsePage() {
     return (
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="card text-center p-6">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Page</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="text-xl font-bold text-red-600 mb-4">Error Loading Page</h1>
+          <p className="text-gray-600 mb-6 text-sm">{error}</p>
           <button
             onClick={() => navigate('/')}
             className="btn-primary"
@@ -102,8 +102,8 @@ export default function HowToUsePage() {
      return (
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="card text-center p-6">
-          <h1 className="text-2xl font-bold text-gray-700 mb-4">Content Not Available</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-xl font-bold text-gray-700 mb-4">Content Not Available</h1>
+          <p className="text-gray-600 mb-6 text-sm">
             The "How to Use" guide is currently not available for {languageLabels[displayLanguage] || displayLanguage.toUpperCase()}.
           </p>
            <button
@@ -119,13 +119,17 @@ export default function HowToUsePage() {
 
   return (
     <article className="max-w-4xl mx-auto py-8 px-4">
+      <div className="flex justify-start mb-6"> {/* Back to Home button container */}
+        <Link to="/" className="btn-primary">Back to Home</Link>
+      </div>
       <div className="card p-6 md:p-8">
         {displayLanguage !== language && (
           <p className="text-sm text-yellow-800 bg-yellow-100 p-3 rounded-md mb-6 border border-yellow-200">
             Note: Content for '{languageLabels[language]}' was not found. Displaying in {languageLabels[displayLanguage]}.
           </p>
         )}
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
+        {/* Main page title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
           {pageTitle}
         </h1>
         {/* Using "prose" for default Tailwind Typography styling (smaller than prose-lg) */}
