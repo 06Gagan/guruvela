@@ -6,9 +6,10 @@ import ContentPage from './pages/ContentPage';
 import FAQListPage from './pages/FAQListPage'; 
 import RankPredictorPage from './pages/RankPredictorPage';
 import CsabRankPredictorPage from './pages/CsabRankPredictorPage';
-import MentorsPage from './pages/MentorsPage'; // Import the new page
+import MentorsPage from './pages/MentorsPage';
+import HowToUsePage from './pages/HowToUsePage'; // Import the new page
 import { LanguageProvider } from './contexts/LanguageContext';
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react"; // Assuming you'll re-add if needed
 
 function App() {
   return (
@@ -21,10 +22,14 @@ function App() {
             <Route path="faqs" element={<FAQListPage />} /> 
             <Route path="rank-predictor" element={<RankPredictorPage />} />
             <Route path="csab-predictor" element={<CsabRankPredictorPage />} />
-            <Route path="mentors" element={<MentorsPage />} /> {/* Add this new route */}
+            <Route path="mentors" element={<MentorsPage />} />
+            <Route path="how-to-use" element={<HowToUsePage />} /> {/* Added route for How To Use page */}
+            {/* You might want a 404 page here as well */}
+            {/* <Route path="*" element={<NotFoundPage />} /> */}
           </Route>
         </Routes>
       </Router>
+      {/* <Analytics /> */}
     </LanguageProvider>
   );
 }

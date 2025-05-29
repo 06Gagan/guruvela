@@ -11,7 +11,7 @@ export default function Header() {
   
   const langDropdownRef = useRef(null);
   const predictorDropdownRef = useRef(null);
-  const mobileMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null); // Ref for the mobile menu itself
 
   const handleLanguageChange = (langCode) => {
     changeLanguage(langCode);
@@ -39,6 +39,7 @@ export default function Header() {
       if (predictorDropdownRef.current && !predictorDropdownRef.current.contains(event.target)) {
         setIsPredictorDropdownOpen(false);
       }
+      // Check if the click is outside the mobile menu and not on the toggle button
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('button[aria-label="Open navigation menu"]')) {
         setIsMobileMenuOpen(false);
       }
@@ -55,6 +56,7 @@ export default function Header() {
             Guruvela
           </Link>
 
+          {/* Mobile Menu Toggle Button */}
           <div className="md:hidden">
             <button
               type="button"
@@ -73,8 +75,9 @@ export default function Header() {
             </button>
           </div>
 
+          {/* Navigation Links - Conditional rendering for mobile */}
           <div 
-            ref={mobileMenuRef}
+            ref={mobileMenuRef} // Add ref here
             className={`
               absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none md:static md:w-auto md:flex md:items-center md:space-x-3
               ${isMobileMenuOpen ? 'block' : 'hidden'}
@@ -83,6 +86,7 @@ export default function Header() {
             `}
           >
             <div className="flex flex-col md:flex-row md:items-center md:space-x-3 px-4 py-2 md:p-0">
+              {/* Rank Predictor Dropdown */}
               <div className="relative py-2 md:py-0" ref={predictorDropdownRef}>
                 <button
                   type="button"
@@ -100,13 +104,12 @@ export default function Header() {
                 )}
               </div>
 
-              {/* Add new Mentors link here */}
               <Link to="/mentors" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>Mentors</Link>
-
               <Link to="/pages/about-us" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>About</Link>
-              <Link to="/pages/how-to-use" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>How to Use</Link>
+              <Link to="/how-to-use" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>How to Use</Link> {/* Updated Link */}
               <Link to="/faqs" className="text-gray-600 hover:text-primary py-2 px-1 md:px-2 rounded block transition-colors duration-150" onClick={closeAllDropdowns}>FAQ & Guides</Link>
 
+              {/* Language Dropdown */}
               <div className="relative py-2 md:py-0" ref={langDropdownRef}>
                 <button
                   type="button"
