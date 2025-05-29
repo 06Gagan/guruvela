@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function ContentPage() {
-  const { slug } = useParams(); 
+  const { slug } = useParams(); // This 'slug' will be 'about-us', 'how-to-use', etc.
   const { language } = useLanguage(); 
   const navigate = useNavigate();
 
@@ -20,7 +20,7 @@ export default function ContentPage() {
   useEffect(() => {
     const fetchContent = async () => {
       if (!slug) {
-        setError('Page slug is missing.'); 
+        setError('Page identifier is missing.'); 
         setLoading(false); 
         return;
       }
@@ -32,36 +32,36 @@ export default function ContentPage() {
 
       try {
         let { data, error: supabaseError } = await supabase
-          .from('content_pages') 
-          .select('title, content_markdown, language, page_type') 
-          .eq('slug', slug)
-          .eq('language', currentLangToFetch) 
+          .from('static_page_content') // Fetching from the new table
+          .select('title, content_markdown, language_code') 
+          .eq('page_identifier', slug) // Using slug from URL as page_identifier
+          .eq('language_code', currentLangToFetch) 
           .single();
 
         if (supabaseError || !data) {
           if (currentLangToFetch !== 'en') {
-            console.warn(`Content for slug '${slug}' in '${currentLangToFetch}' not found. Trying English fallback.`);
+            console.warn(`Content for page '${slug}' in '${currentLangToFetch}' not found. Trying English fallback.`);
             setDisplayLanguage('en'); 
             let { data: fallbackData, error: fallbackError } = await supabase
-              .from('content_pages')
-              .select('title, content_markdown, language, page_type')
-              .eq('slug', slug)
-              .eq('language', 'en')
+              .from('static_page_content')
+              .select('title, content_markdown, language_code')
+              .eq('page_identifier', slug)
+              .eq('language_code', 'en')
               .single();
             
             if (fallbackError || !fallbackData) {
-              throw new Error(fallbackError?.message || `Page "${slug}" not found in English or the selected language.`);
+              throw new Error(fallbackError?.message || `Page "${slug}" content not found in English.`);
             }
             setPageData(fallbackData);
           } else { 
-            throw new Error(supabaseError?.message || `Page "${slug}" not found.`);
+            throw new Error(supabaseError?.message || `Page "${slug}" content not found.`);
           }
         } else {
          setPageData(data);
-         setDisplayLanguage(data.language); 
+         setDisplayLanguage(data.language_code); 
         }
       } catch (err) {
-        console.error(`Error fetching content for slug: ${slug}, language: ${currentLangToFetch}`, err);
+        console.error(`Error fetching content for page '${slug}', language: ${currentLangToFetch}`, err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -108,10 +108,8 @@ export default function ContentPage() {
                 Note: Content for '{languageLabels[language]}' was not found. Displaying in {languageLabels[displayLanguage]}.
               </p>
             )}
-            {/* Main page title - font size reduced */}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">{pageData.title}</h1>
-            {/* Using "prose" for default Tailwind Typography styling (smaller than prose-lg) */}
-            <div className="prose max-w-none"> {/* Ensured this is 'prose' and not 'prose-lg' */}
+            <div className="prose max-w-none">
               <ReactMarkdown>{pageData.content_markdown}</ReactMarkdown>
             </div>
           </>

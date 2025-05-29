@@ -86,8 +86,8 @@ export default function ChatInterface() {
 
     const translatedCategories = initialCategoriesBase.map(cat => ({
       ...cat,
-      label: langTrans[cat.labelKey] || cat.defaultLabel, // Ensure fallback if key is missing
-      exampleQuery: langTrans[cat.queryKey] || cat.defaultExampleQuery, // Ensure fallback
+      label: langTrans[cat.labelKey] || cat.defaultLabel, 
+      exampleQuery: langTrans[cat.queryKey] || cat.defaultExampleQuery,
     }));
     setCurrentCategories(translatedCategories);
 
@@ -96,12 +96,16 @@ export default function ChatInterface() {
       content: langTrans.greeting,
       suggestions: translatedCategories,
       relatedContent: null,
-      showHowToUseSuggestion: false, // Initialize
+      showHowToUseSuggestion: false,
     }]);
   }, [language]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Delaying scrollIntoView slightly can sometimes help after DOM updates
+    const timer = setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 0); // A timeout of 0 ms pushes it to the end of the event queue
+    return () => clearTimeout(timer);
   }, [chatHistory]);
 
   const findBestResponse = async (userMessage, currentLang) => {
@@ -116,10 +120,10 @@ export default function ChatInterface() {
       } else {
         const searchTerms = userMessage.toLowerCase().split(' ').filter(term => term.length > 1 && term.length < 25);
         if (searchTerms.length === 0) {
-          return {
-            content: langTrans.askSpecific,
-            relatedContent: null, // No specific related content for "ask specific"
-            showHowToUseSuggestion: true // Suggest "How to Use" for very generic queries
+          return { 
+            content: langTrans.askSpecific, 
+            relatedContent: null, 
+            showHowToUseSuggestion: true 
           };
         }
         const keywordConditions = searchTerms.map(term => `question_keywords.cs.{${term.trim().replace(/'/g, "''")}}`).join(',');
@@ -130,7 +134,7 @@ export default function ChatInterface() {
       let { data, error } = await queryBuilder;
 
       if (error || !data || (Array.isArray(data) && data.length === 0) ) {
-        if (currentLang !== 'en') {
+        if (currentLang !== 'en') { 
           console.warn(`No response in ${currentLang} for "${userMessage}". Trying English fallback.`);
           if (clickedSuggestion) {
             queryBuilder = supabase.from('fixed_responses').select('answer_text, related_content_slug').eq('topic_id', clickedSuggestion.topicId).eq('language', 'en').single();
@@ -145,37 +149,34 @@ export default function ChatInterface() {
             const { data: enData, error: enError } = await queryBuilder;
             if (!enError && enData && ( (Array.isArray(enData) && enData.length > 0) || (!Array.isArray(enData) && enData) ) ) {
               const responseData = Array.isArray(enData) ? enData[0] : enData;
-              return {
-                content: `${responseData.answer_text} ${langTrans.englishFallbackNotice}`,
+              return { 
+                content: `${responseData.answer_text} ${langTrans.englishFallbackNotice}`, 
                 relatedContent: responseData.related_content_slug,
-                // If English fallback also has a specific related content, don't force "How to Use" unless it's also a fallback.
-                // This logic can be refined if specific English fallbacks should also trigger "How to Use".
                 showHowToUseSuggestion: responseData.related_content_slug === 'josaa-comprehensive-faq' 
               };
             }
           }
         }
-        // This is the main fallback if no specific answer is found in any language
-        return {
-          content: langTrans.fallbackResponse,
-          relatedContent: 'josaa-comprehensive-faq', // This slug will now point to /faqs
-          showHowToUseSuggestion: true // Show "How to Use" for general fallback
+        return { 
+          content: langTrans.fallbackResponse, 
+          relatedContent: 'josaa-comprehensive-faq', 
+          showHowToUseSuggestion: true 
         };
       }
       
       const responseData = Array.isArray(data) ? data[0] : data;
-      return {
-        content: responseData.answer_text,
+      return { 
+        content: responseData.answer_text, 
         relatedContent: responseData.related_content_slug,
-        showHowToUseSuggestion: false // Don't show if a specific answer is found
+        showHowToUseSuggestion: false 
       };
 
     } catch (catchError) {
       console.error('Error in findBestResponse:', catchError);
-      return {
-        content: langTrans.connectionError,
+      return { 
+        content: langTrans.connectionError, 
         relatedContent: null,
-        showHowToUseSuggestion: true // Show on connection error too
+        showHowToUseSuggestion: true 
       };
     }
   };
@@ -187,9 +188,7 @@ export default function ChatInterface() {
 
     setIsLoading(true);
     const userMessageObject = { type: 'user', content: currentMessageText };
-    
-    setChatHistory(prev => prev.map(msg => ({ ...msg, suggestions: null, showHowToUseSuggestion: msg.showHowToUseSuggestion })).concat([userMessageObject]));
-    
+        
     const response = await findBestResponse(currentMessageText, language);
 
     const newBotMessage = {
@@ -204,12 +203,19 @@ export default function ChatInterface() {
         newBotMessage.suggestions = currentCategories;
     }
 
-    setChatHistory(prev => [...prev, newBotMessage]);
+    setChatHistory(prev => {
+      const updatedHistory = prev.map(msg => ({ 
+        ...msg, 
+        suggestions: null, 
+        showHowToUseSuggestion: msg.showHowToUseSuggestion 
+      }));
+      return [...updatedHistory, userMessageObject, newBotMessage];
+    });
+
     if (!directMessage) setMessage('');
     setIsLoading(false);
   };
   
-  // Updated getLearnMoreLink to handle the specific case for 'josaa-comprehensive-faq'
   const getLearnMoreLinkPath = (slug) => {
     if (slug === 'josaa-comprehensive-faq') {
       return '/faqs';
