@@ -14,7 +14,7 @@ import MentorsPage from './pages/MentorsPage';
 import HowToUsePage from './pages/HowToUsePage'; 
 import AboutUsPage from './pages/AboutUsPage';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { Analytics } from "@vercel/analytics/react"; // Keep the import
+import { SpeedInsights } from "@vercel/speed-insights/react"; // Keep the import
 
 // Define the routes using the createBrowserRouter API
 const router = createBrowserRouter([
@@ -77,6 +77,8 @@ function App() {
       />
       */}
       <RouterProvider router={router} />
+      {/* Vercel Speed Insights component */}
+      <SpeedInsights />
       {/* Vercel Analytics component */}
       {/* Temporarily commented out for debugging */}
       {/* <Analytics /> */}
