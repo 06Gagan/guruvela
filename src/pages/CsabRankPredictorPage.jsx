@@ -22,7 +22,7 @@ export default function CsabRankPredictorPage() {
     "ST", "ST (PwD)"
   ];
 
-  const quotaOptions = ["AI", "HS", "OS", "GO"]; 
+  const quotaOptions = [ "OS", "HS", "GO"]; 
   
   const genderOptions = [
     "Gender-Neutral",

@@ -1,16 +1,16 @@
-// src/pages/RankPredictorPage.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function RankPredictorPage() {
   const [rank, setRank] = useState('');
-  const [examType, setExamType] = useState('JEE Main');
+  const [examType, setExamType] = useState('JEE Main'); // Initial exam type
   const [category, setCategory] = useState('OPEN');
-  const [quota, setQuota] = useState('AI');
+  // Initial quota state, useEffect will adjust it based on examType
+  const [quota, setQuota] = useState(''); // Initialize as empty, useEffect will set it
   const [gender, setGender] = useState('Gender-Neutral');
   const [isPreparatoryRank, setIsPreparatoryRank] = useState(false);
-  
+
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -19,13 +19,35 @@ export default function RankPredictorPage() {
   const preparatoryGuideLink = "/pages/iit-preparatory-courses-guide";
 
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
-  const quotaOptions = { 'JEE Main': ["AI", "HS", "OS", "GO"], 'JEE Advanced': ["AI"] };
+  // Updated quotaOptions as per new requirement
+  const quotaOptions = {
+    'JEE Main': ["HS", "OS", "GO"], // Home State, Other State, Government for JEE Main
+    'JEE Advanced': ["AI"]          // All India for JEE Advanced
+  };
   const genderOptions = ["Gender-Neutral", "Female-only (including Supernumerary)"];
 
   useEffect(() => {
-    if (examType === 'JEE Advanced') setQuota('AI');
-    else if (!quotaOptions['JEE Main'].includes(quota)) setQuota('AI'); 
-  }, [examType, quota]);
+    // Adjust quota based on selected exam type
+    if (examType === 'JEE Advanced') {
+      setQuota('AI');
+    } else if (examType === 'JEE Main') {
+      // Default to the first available option for JEE Main if current quota isn't valid for it
+      const mainExamQuotas = quotaOptions['JEE Main'];
+      if (!mainExamQuotas.includes(quota)) {
+        setQuota(mainExamQuotas[0] || ''); // Set to "HS" or first option
+      }
+    }
+  }, [examType, quota]); // React to changes in examType or if quota becomes invalid for JEE Main
+
+  // Effect to set initial quota based on initial examType
+  useEffect(() => {
+    if (examType === 'JEE Main') {
+      setQuota(quotaOptions['JEE Main'][0] || ''); // e.g., "HS"
+    } else if (examType === 'JEE Advanced') {
+      setQuota('AI');
+    }
+  }, []); // Run only once on mount for initial setup
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +56,7 @@ export default function RankPredictorPage() {
     try {
       const userRankInt = parseInt(rank);
       if (isNaN(userRankInt) || userRankInt <= 0) throw new Error("Invalid rank entered.");
-      
+
       let query = supabase.from('college_cutoffs')
         .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, is_preparatory, id, exam_type')
         .eq('year', 2024)
@@ -42,13 +64,16 @@ export default function RankPredictorPage() {
         .eq('exam_type', examType)
         .eq('seat_type', category);
 
-      if (examType === 'JEE Main' && quota) query = query.eq('quota', quota);
-      else if (examType === 'JEE Advanced') query = query.eq('quota', 'AI');
+      // Apply quota filter based on the state, which is now correctly managed
+      if (quota) { // Ensure quota is not empty before applying
+          query = query.eq('quota', quota);
+      }
+
       if (gender) query = query.eq('gender', gender);
       query = query.eq('is_preparatory', isPreparatoryRank);
       query = query.gte('closing_rank', userRankInt);
       query = query.order('closing_rank', { ascending: true }).limit(100);
-      
+
       const { data: fetchedData, error: supabaseError } = await query;
       if (supabaseError) throw supabaseError;
       setResults(fetchedData || []);
@@ -64,8 +89,8 @@ export default function RankPredictorPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-start mb-4">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="btn-outline flex items-center gap-2 hover:bg-gray-50"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,36 +107,33 @@ export default function RankPredictorPage() {
 
       <form onSubmit={handleSubmit} className="card mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {/* Rank Input */}
+          {/* Rank Input - Stays as Category Rank */}
           <div>
             <label htmlFor="rank" className="form-label">
-              Your Rank
-              <span className="text-gray-500 text-xs ml-1">
-                ({examType === 'JEE Advanced' ? 'Category Rank' : 'CRL'})
-              </span>
+              Your Category Rank
             </label>
-            <input 
-              type="number" 
-              id="rank" 
-              value={rank} 
-              onChange={(e) => setRank(e.target.value)} 
-              placeholder={examType === 'JEE Advanced' ? "Enter Category Rank" : "Enter CRL"} 
-              required 
+            <input
+              type="number"
+              id="rank"
+              value={rank}
+              onChange={(e) => setRank(e.target.value)}
+              placeholder="Enter Category Rank"
+              required
               className="form-input"
               aria-describedby="rank-description"
             />
             <p id="rank-description" className="text-xs text-gray-500 mt-1">
-              Enter your {examType === 'JEE Advanced' ? 'Category Rank' : 'Common Rank List (CRL)'}
+              Enter your Category Rank
             </p>
           </div>
 
           {/* Exam Type */}
           <div>
             <label htmlFor="examType" className="form-label">Exam Type</label>
-            <select 
-              id="examType" 
-              value={examType} 
-              onChange={(e) => setExamType(e.target.value)} 
+            <select
+              id="examType"
+              value={examType}
+              onChange={(e) => setExamType(e.target.value)}
               className="form-input"
             >
               <option value="JEE Main">JEE Main</option>
@@ -122,10 +144,10 @@ export default function RankPredictorPage() {
           {/* Category */}
           <div>
             <label htmlFor="category" className="form-label">Category (Seat Type)</label>
-            <select 
-              id="category" 
-              value={category} 
-              onChange={(e) => setCategory(e.target.value)} 
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               className="form-input"
             >
               {seatTypeOptions.map(opt => (
@@ -134,24 +156,26 @@ export default function RankPredictorPage() {
             </select>
           </div>
 
-          {/* Quota */}
+          {/* Quota - Updated as per your new requirement */}
           <div>
             <label htmlFor="quota" className="form-label">Quota</label>
-            <select 
-              id="quota" 
-              value={quota} 
-              onChange={(e) => setQuota(e.target.value)} 
+            <select
+              id="quota"
+              value={quota}
+              onChange={(e) => setQuota(e.target.value)}
               className="form-input"
-              disabled={examType === 'JEE Advanced'}
+              disabled={examType === 'JEE Advanced'} // Disabled only for JEE Advanced
               aria-describedby="quota-description"
             >
-              {(quotaOptions[examType] || quotaOptions['JEE Main']).map(opt => (
+              {/* Dynamically populate options based on examType */}
+              {(quotaOptions[examType] || []).map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
+            {/* Description only for JEE Advanced */}
             {examType === 'JEE Advanced' && (
               <p id="quota-description" className="text-xs text-gray-500 mt-1">
-                Quota is AI for IITs
+                Quota is AI (All India) for IITs.
               </p>
             )}
           </div>
@@ -159,10 +183,10 @@ export default function RankPredictorPage() {
           {/* Gender */}
           <div>
             <label htmlFor="gender" className="form-label">Gender</label>
-            <select 
-              id="gender" 
-              value={gender} 
-              onChange={(e) => setGender(e.target.value)} 
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
               className="form-input"
             >
               {genderOptions.map(opt => (
@@ -174,21 +198,21 @@ export default function RankPredictorPage() {
           {/* Preparatory Rank */}
           <div className="flex items-center space-x-2">
             <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                id="isPreparatoryRank" 
-                checked={isPreparatoryRank} 
-                onChange={(e) => setIsPreparatoryRank(e.target.checked)} 
+              <input
+                type="checkbox"
+                id="isPreparatoryRank"
+                checked={isPreparatoryRank}
+                onChange={(e) => setIsPreparatoryRank(e.target.checked)}
                 className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
               />
               <label htmlFor="isPreparatoryRank" className="ml-2 text-sm font-medium text-gray-700">
                 Preparatory Rank
               </label>
             </div>
-            <Link 
-              to={preparatoryGuideLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <Link
+              to={preparatoryGuideLink}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-xs text-accent hover:text-accent-dark hover:underline"
               title="Learn more about IIT Preparatory Ranks"
             >
@@ -198,8 +222,8 @@ export default function RankPredictorPage() {
         </div>
 
         <div className="text-center pt-6">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="btn-primary px-8 py-3 text-lg min-w-[200px] flex items-center justify-center gap-2"
             disabled={isLoading}
           >
@@ -222,7 +246,7 @@ export default function RankPredictorPage() {
           </button>
         </div>
       </form>
-      
+
       {/* Loading State */}
       {isLoading && (
         <div className="text-center py-8">
@@ -267,7 +291,7 @@ export default function RankPredictorPage() {
               </span>
             </h2>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="table">
               <thead>
@@ -292,10 +316,10 @@ export default function RankPredictorPage() {
                       <div className="flex items-center">
                         <span>{item.closing_rank}</span>
                         {item.is_preparatory && (
-                          <Link 
-                            to={preparatoryGuideLink} 
+                          <Link
+                            to={preparatoryGuideLink}
                             className="ml-2 inline-flex items-center text-xs text-accent hover:text-accent-dark hover:underline"
-                            target="_blank" 
+                            target="_blank"
                             rel="noopener noreferrer"
                             title="This is a preparatory course rank"
                           >
