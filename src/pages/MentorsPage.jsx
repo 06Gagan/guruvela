@@ -2,21 +2,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import MentorCard from '../components/Mentors/MentorCard'; 
+import MentorCard from '../components/Mentors/MentorCard';
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // === Your actual links are now embedded here ===
-  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw"; 
-  const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform"; 
-  // ==========================================================================
+  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw";
+  const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform";
 
-  // These are placeholder strings used for comparison to determine if a "real" link was intended
-  // They help in styling the link as active or disabled if the actual links above were accidentally reverted to placeholders
-  const GENERAL_GROUP_LINK_PLACEHOLDER = "YOUR_GENERAL_GROUP_LINK_HERE"; 
+  const GENERAL_GROUP_LINK_PLACEHOLDER = "YOUR_GENERAL_GROUP_LINK_HERE";
   const PREMIUM_GUIDANCE_LINK_PLACEHOLDER = "YOUR_PREMIUM_GUIDANCE_LINK_HERE";
 
 
@@ -25,13 +21,9 @@ export default function MentorsPage() {
       setLoading(true);
       setError(null);
       try {
-        // Ensure this select statement matches your actual 'mentors' table columns
-        // For example, if your table does NOT have 'introduction', 'group_guidance_link', 
-        // or 'premium_guidance_link' as per-mentor fields, remove them from this select.
-        // Based on your last SQL, 'introduction' and per-mentor 'premium_guidance_link' were removed.
         const { data, error: supabaseError } = await supabase
           .from('mentors')
-          .select('id, name, profile_image_path, branch, state, google_form_link_1_to_1, group_guidance_link') 
+          .select('id, name, profile_image_path, branch, state, google_form_link_1_to_1, group_guidance_link, linkedin_url')
           .eq('active', true)
           .order('sort_order', { ascending: true });
 
@@ -69,8 +61,6 @@ export default function MentorsPage() {
     );
   }
 
-  // Determine if the links are effectively placeholders (for styling and functionality)
-  // This will be false if you have replaced the placeholder strings above with actual links.
   const isGeneralLinkEffectivelyPlaceholder = actualGeneralGroupLink === GENERAL_GROUP_LINK_PLACEHOLDER;
   const isPremiumLinkEffectivelyPlaceholder = actualPremiumGuidanceLink === PREMIUM_GUIDANCE_LINK_PLACEHOLDER;
 
@@ -103,11 +93,11 @@ export default function MentorsPage() {
       <div className="mt-12 p-6 md:p-8 bg-blue-50 rounded-lg shadow-md text-center">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Other Mentorship Options</h2>
         <p className="text-gray-700 mb-3">
-          For general guidance in a group setting, you can join our community group: 
-          <a 
+          For general guidance in a group setting, you can join our community group:
+          <a
             href={isGeneralLinkEffectivelyPlaceholder ? "#" : actualGeneralGroupLink}
-            target="_blank" 
-            rel="noopener noreferrer" 
+            target="_blank"
+            rel="noopener noreferrer"
             className={`ml-1 font-semibold ${isGeneralLinkEffectivelyPlaceholder ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
             aria-disabled={isGeneralLinkEffectivelyPlaceholder}
             onClick={(e) => isGeneralLinkEffectivelyPlaceholder && e.preventDefault()}
@@ -117,10 +107,10 @@ export default function MentorsPage() {
         </p>
         <p className="text-gray-700">
           Need more dedicated support, such as early WhatsApp replies or direct calls?
-          <a 
+          <a
             href={isPremiumLinkEffectivelyPlaceholder ? "#" : actualPremiumGuidanceLink}
-            target="_blank" 
-            rel="noopener noreferrer" 
+            target="_blank"
+            rel="noopener noreferrer"
             className={`ml-1 font-semibold ${isPremiumLinkEffectivelyPlaceholder ? 'text-gray-400 cursor-not-allowed' : 'text-accent hover:underline'}`}
             aria-disabled={isPremiumLinkEffectivelyPlaceholder}
             onClick={(e) => isPremiumLinkEffectivelyPlaceholder && e.preventDefault()}
