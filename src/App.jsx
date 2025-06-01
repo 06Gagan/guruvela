@@ -1,29 +1,30 @@
 // src/App.jsx
-import { 
-  createBrowserRouter, 
-  RouterProvider, 
-  ScrollRestoration // Keep the import for now, even if component is commented out
+import {
+  createBrowserRouter,
+  RouterProvider,
 } from 'react-router-dom';
 import MainLayout from './components/Layout/MainLayout';
 import ChatInterface from './components/Chatbot/ChatInterface';
-import ContentPage from './pages/ContentPage'; // For FAQs, Guides, etc. from 'content_pages' table
-import FAQListPage from './pages/FAQListPage'; 
+import ContentPage from './pages/ContentPage';
+import FAQListPage from './pages/FAQListPage';
 import RankPredictorPage from './pages/RankPredictorPage';
 import CsabRankPredictorPage from './pages/CsabRankPredictorPage';
 import MentorsPage from './pages/MentorsPage';
-import HowToUsePage from './pages/HowToUsePage'; 
+import HowToUsePage from './pages/HowToUsePage';
 import AboutUsPage from './pages/AboutUsPage';
+import JosaaDocumentsPage from './pages/JosaaDocumentsPage';
+// CsabDocumentsPage is no longer needed as a separate page if linking directly
+// import CsabDocumentsPage from './pages/CsabDocumentsPage'; 
 import { LanguageProvider } from './contexts/LanguageContext';
-import { SpeedInsights } from "@vercel/speed-insights/react"; // Keep the import
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
-// Define the routes using the createBrowserRouter API
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />, // MainLayout will contain the Outlet for children
+    element: <MainLayout />,
     children: [
       {
-        index: true, // This makes ChatInterface the default child for "/"
+        index: true,
         element: <ChatInterface />
       },
       {
@@ -35,11 +36,15 @@ const router = createBrowserRouter([
         element: <HowToUsePage />
       },
       {
-        path: "pages/:slug", // For individual FAQ/Guide pages
+        path: "josaa-documents", 
+        element: <JosaaDocumentsPage />
+      },
+      {
+        path: "pages/:slug",
         element: <ContentPage />
       },
       {
-        path: "faqs", // For the list of FAQs and Guides
+        path: "faqs",
         element: <FAQListPage />
       },
       {
@@ -54,11 +59,6 @@ const router = createBrowserRouter([
         path: "mentors",
         element: <MentorsPage />
       }
-      // TODO: Add a 404 Not Found route if desired
-      // {
-      //   path: "*",
-      //   element: <NotFoundPage /> 
-      // }
     ]
   }
 ]);
@@ -66,22 +66,8 @@ const router = createBrowserRouter([
 function App() {
   return (
     <LanguageProvider>
-      {/* ScrollRestoration helps manage scroll position on navigation */}
-      {/* Temporarily commented out for debugging */}
-      {/* <ScrollRestoration 
-        getKey={(location, matches) => {
-          // Default key generation, or customize if needed
-          // Using the default often works well with createBrowserRouter
-          return location.pathname; 
-        }}
-      />
-      */}
       <RouterProvider router={router} />
-      {/* Vercel Speed Insights component */}
       <SpeedInsights />
-      {/* Vercel Analytics component */}
-      {/* Temporarily commented out for debugging */}
-      {/* <Analytics /> */}
     </LanguageProvider>
   );
 }

@@ -1,17 +1,19 @@
 // src/components/Layout/Header.jsx
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/LanguageContext'; // Corrected path
 
 export default function Header() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isPredictorDropdownOpen, setIsPredictorDropdownOpen] = useState(false);
+  const [isDocumentsDropdownOpen, setIsDocumentsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { language, changeLanguage, supportedLanguages } = useLanguage();
   const location = useLocation();
   
   const langDropdownRef = useRef(null);
   const predictorDropdownRef = useRef(null);
+  const documentsDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
 
   const handleLanguageChange = (langCode) => {
@@ -23,6 +25,7 @@ export default function Header() {
   const closeAllDropdowns = () => {
     setIsLangDropdownOpen(false);
     setIsPredictorDropdownOpen(false);
+    setIsDocumentsDropdownOpen(false);
     setIsMobileMenuOpen(false);
   };
 
@@ -39,6 +42,9 @@ export default function Header() {
       }
       if (predictorDropdownRef.current && !predictorDropdownRef.current.contains(event.target)) {
         setIsPredictorDropdownOpen(false);
+      }
+      if (documentsDropdownRef.current && !documentsDropdownRef.current.contains(event.target)) {
+        setIsDocumentsDropdownOpen(false);
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('button[aria-label="Open navigation menu"]')) {
         setIsMobileMenuOpen(false);
@@ -65,7 +71,6 @@ export default function Header() {
             Guruvela
           </Link>
 
-          {/* Mobile Menu Toggle Button */}
           <div className="md:hidden">
             <button
               type="button"
@@ -85,7 +90,6 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Navigation Links */}
           <div 
             id="mobile-menu"
             ref={mobileMenuRef}
@@ -97,7 +101,6 @@ export default function Header() {
             `}
           >
             <div className="flex flex-col md:flex-row md:items-center md:space-x-3 px-4 py-2 md:p-0">
-              {/* Rank Predictor Dropdown */}
               <div className="relative py-2 md:py-0" ref={predictorDropdownRef}>
                 <button
                   type="button"
@@ -136,6 +139,47 @@ export default function Header() {
                   </div>
                 )}
               </div>
+              
+              <div className="relative py-2 md:py-0" ref={documentsDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsDocumentsDropdownOpen(prev => !prev)}
+                  className={`w-full text-left md:text-center py-2 px-1 md:px-2 rounded-lg flex items-center justify-between md:justify-start transition-colors duration-150
+                    ${isDocumentsDropdownOpen ? 'text-primary bg-gray-50' : 'text-gray-600 hover:text-primary hover:bg-gray-50'}
+                    focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                  aria-expanded={isDocumentsDropdownOpen}
+                  aria-controls="documents-dropdown"
+                >
+                  Documents
+                  <svg className={`w-4 h-4 inline-block ml-1 transition-transform duration-200 ${isDocumentsDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                {isDocumentsDropdownOpen && (
+                  <div
+                    id="documents-dropdown"
+                    className="md:absolute static z-30 md:right-0 mt-1 w-full md:w-48 bg-white rounded-lg shadow-lg py-1 border border-gray-200"
+                    role="menu"
+                  >
+                    <Link
+                      to="/josaa-documents"
+                      className={`block px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 ${isActive('/josaa-documents') ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
+                      onClick={closeAllDropdowns}
+                      role="menuitem"
+                    >
+                      JoSAA Documents
+                    </Link>
+                    <a
+                      href="https://drive.google.com/file/d/1Ycew4aaCgDVYfyLI8-H7YtZ9ff4WiQNw/view?usp=sharing" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150"
+                      onClick={closeAllDropdowns}
+                      role="menuitem"
+                    >
+                      CSAB Documents
+                    </a>
+                  </div>
+                )}
+              </div>
 
               <Link 
                 to="/mentors" 
@@ -146,7 +190,7 @@ export default function Header() {
               </Link>
               <Link 
                 to="/about-us" 
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/pages/about-us') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/about-us') ? 'nav-link-active bg-gray-50' : ''}`}
                 onClick={closeAllDropdowns}
               >
                 About
@@ -166,7 +210,6 @@ export default function Header() {
                 FAQ & Guides
               </Link>
 
-              {/* Language Dropdown */}
               <div className="relative py-2 md:py-0" ref={langDropdownRef}>
                 <button
                   type="button"
