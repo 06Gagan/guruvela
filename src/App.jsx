@@ -13,8 +13,7 @@ import MentorsPage from './pages/MentorsPage';
 import HowToUsePage from './pages/HowToUsePage';
 import AboutUsPage from './pages/AboutUsPage';
 import JosaaDocumentsPage from './pages/JosaaDocumentsPage';
-// CsabDocumentsPage is no longer needed as a separate page if linking directly
-// import CsabDocumentsPage from './pages/CsabDocumentsPage'; 
+import PreferenceGuidesPage from './pages/PreferenceGuidesPage'; // Import the new page
 import { LanguageProvider } from './contexts/LanguageContext';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 
@@ -36,8 +35,12 @@ const router = createBrowserRouter([
         element: <HowToUsePage />
       },
       {
-        path: "josaa-documents", 
+        path: "josaa-documents",
         element: <JosaaDocumentsPage />
+      },
+      {
+        path: "preference-guides", // Add new route for preference guides
+        element: <PreferenceGuidesPage />
       },
       {
         path: "pages/:slug",

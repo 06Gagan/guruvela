@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-// Base structure for initial categories.
 const initialCategoriesBase = [
   { id: 'cat_josaa_docs', topicId: 'josaa_documents_general', labelKey: 'documentsLabel', queryKey: 'documentsQuery' },
   { id: 'cat_seat_allotment', topicId: 'josaa_float_freeze_slide_meaning', labelKey: 'seatAllotmentLabel', queryKey: 'seatAllotmentQuery' },
@@ -12,7 +11,6 @@ const initialCategoriesBase = [
   { id: 'cat_colorblind', topicId: 'josaa_colorblind_general', labelKey: 'colorblindLabel', queryKey: 'colorblindQuery' },
 ];
 
-// Translations
 const uiTranslations = {
   en: {
     greeting: "Hi! I'm Guruvela's assistant. How can I help you with JoSAA/CSAB counseling today?",
@@ -31,6 +29,8 @@ const uiTranslations = {
     howToUseReferralPrefix: "For more help on how to use Guruvela, see our ",
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: ".",
+    predictorPopupText: "Curious about your college options? Try our JoSAA College Predictor!",
+    goToPredictorButton: "JoSAA College Predictor"
   },
   'hi-en': {
     greeting: "Namaste! Main Guruvela ka assistant hoon. JoSAA/CSAB counselling mein aapki kya help kar sakta hoon?",
@@ -49,6 +49,8 @@ const uiTranslations = {
     howToUseReferralPrefix: "Guruvela kaise use karein, iske liye hamara ",
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: " dekhein.",
+    predictorPopupText: "Apne college options ke baare mein जानना chahte hain? Hamara JoSAA College Predictor try karein!",
+    goToPredictorButton: "JoSAA College Predictor"
   },
   'te-en': {
     greeting: "Namaste! Nenu Guruvela assistant. JoSAA/CSAB counselling lo ela help cheyagalanu?",
@@ -67,6 +69,8 @@ const uiTranslations = {
     howToUseReferralPrefix: "Guruvela ela vadalo telusukodaniki, maa ",
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: " chudandi.",
+    predictorPopupText: "Mee college optionla gurinchi telusukovalani unda? Maa JoSAA College Predictor prayatninchandi!",
+    goToPredictorButton: "JoSAA College Predictor"
   }
 };
 
@@ -79,6 +83,7 @@ export default function ChatInterface() {
 
   const [currentCategories, setCurrentCategories] = useState([]);
   const [currentUiText, setCurrentUiText] = useState(uiTranslations.en);
+  const [showPredictorPromo, setShowPredictorPromo] = useState(true);
 
   useEffect(() => {
     const langTrans = uiTranslations[language] || uiTranslations.en;
@@ -101,18 +106,20 @@ export default function ChatInterface() {
   }, [language]);
 
   useEffect(() => {
-    // Delaying scrollIntoView slightly can sometimes help after DOM updates
     const timer = setTimeout(() => {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 0); // A timeout of 0 ms pushes it to the end of the event queue
+    }, 0);
     return () => clearTimeout(timer);
   }, [chatHistory]);
+
+  const handleClosePredictorPromo = () => {
+    setShowPredictorPromo(false);
+  };
 
   const findBestResponse = async (userMessage, currentLang) => {
     const langTrans = uiTranslations[currentLang] || uiTranslations.en;
     try {
       const clickedSuggestion = currentCategories.find(cat => cat.exampleQuery === userMessage && cat.topicId);
-
       let queryBuilder;
       if (clickedSuggestion) {
         queryBuilder = supabase.from('fixed_responses').select('answer_text, related_content_slug')
@@ -130,12 +137,9 @@ export default function ChatInterface() {
         queryBuilder = supabase.from('fixed_responses').select('answer_text, related_content_slug')
           .eq('language', currentLang).or(keywordConditions).limit(1);
       }
-
       let { data, error } = await queryBuilder;
-
       if (error || !data || (Array.isArray(data) && data.length === 0) ) {
         if (currentLang !== 'en') { 
-          console.warn(`No response in ${currentLang} for "${userMessage}". Trying English fallback.`);
           if (clickedSuggestion) {
             queryBuilder = supabase.from('fixed_responses').select('answer_text, related_content_slug').eq('topic_id', clickedSuggestion.topicId).eq('language', 'en').single();
           } else {
@@ -163,16 +167,13 @@ export default function ChatInterface() {
           showHowToUseSuggestion: true 
         };
       }
-      
       const responseData = Array.isArray(data) ? data[0] : data;
       return { 
         content: responseData.answer_text, 
         relatedContent: responseData.related_content_slug,
         showHowToUseSuggestion: false 
       };
-
     } catch (catchError) {
-      console.error('Error in findBestResponse:', catchError);
       return { 
         content: langTrans.connectionError, 
         relatedContent: null,
@@ -185,12 +186,9 @@ export default function ChatInterface() {
     if (e) e.preventDefault();
     const currentMessageText = directMessage || message;
     if (!currentMessageText.trim() || isLoading) return;
-
     setIsLoading(true);
     const userMessageObject = { type: 'user', content: currentMessageText };
-        
     const response = await findBestResponse(currentMessageText, language);
-
     const newBotMessage = {
       type: 'bot',
       content: response.content,
@@ -198,11 +196,9 @@ export default function ChatInterface() {
       suggestions: null,
       showHowToUseSuggestion: response.showHowToUseSuggestion || false
     };
-    
     if (directMessage || (response.showHowToUseSuggestion && (response.relatedContent === 'josaa-comprehensive-faq' || response.relatedContent === null))) {
         newBotMessage.suggestions = currentCategories;
     }
-
     setChatHistory(prev => {
       const updatedHistory = prev.map(msg => ({ 
         ...msg, 
@@ -211,7 +207,6 @@ export default function ChatInterface() {
       }));
       return [...updatedHistory, userMessageObject, newBotMessage];
     });
-
     if (!directMessage) setMessage('');
     setIsLoading(false);
   };
@@ -225,6 +220,30 @@ export default function ChatInterface() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {showPredictorPromo && (
+        <div className="relative bg-gray-100 border border-gray-200 p-3 sm:p-4 mb-4 rounded-lg shadow flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
+          <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-0 sm:mr-4">
+            {currentUiText.predictorPopupText}
+          </p>
+          <Link 
+            to="/rank-predictor"
+            className="btn-primary py-1.5 px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
+            onClick={handleClosePredictorPromo}
+          >
+            {currentUiText.goToPredictorButton}
+          </Link>
+          <button 
+            onClick={handleClosePredictorPromo} 
+            className="absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-600 sm:static sm:ml-2" // Adjusted for better mobile placement
+            aria-label="Close predictor promotion"
+          >
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       <div className="card h-[calc(100vh-200px)] sm:h-[600px] flex flex-col">
         <div 
           className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"

@@ -1,7 +1,7 @@
 // src/components/Layout/Header.jsx
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext'; // Corrected path
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Header() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -180,6 +180,14 @@ export default function Header() {
                   </div>
                 )}
               </div>
+
+              <Link 
+                to="/preference-guides"  // New Link for Preference Guides
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/preference-guides') ? 'nav-link-active bg-gray-50' : ''}`}
+                onClick={closeAllDropdowns}
+              >
+                Preference Guides
+              </Link>
 
               <Link 
                 to="/mentors" 
