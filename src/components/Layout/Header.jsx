@@ -7,14 +7,14 @@ export default function Header() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [isPredictorDropdownOpen, setIsPredictorDropdownOpen] = useState(false);
   const [isDocumentsDropdownOpen, setIsDocumentsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // This state controls the mobile menu
   const { language, changeLanguage, supportedLanguages } = useLanguage();
   const location = useLocation();
   
   const langDropdownRef = useRef(null);
   const predictorDropdownRef = useRef(null);
   const documentsDropdownRef = useRef(null);
-  const mobileMenuRef = useRef(null);
+  const mobileMenuRef = useRef(null); // Ref for the mobile menu panel itself
 
   const handleLanguageChange = (langCode) => {
     changeLanguage(langCode);
@@ -26,7 +26,7 @@ export default function Header() {
     setIsLangDropdownOpen(false);
     setIsPredictorDropdownOpen(false);
     setIsDocumentsDropdownOpen(false);
-    setIsMobileMenuOpen(false);
+    setIsMobileMenuOpen(false); // This will be called by nav links
   };
 
   const languageLabels = {
@@ -46,7 +46,11 @@ export default function Header() {
       if (documentsDropdownRef.current && !documentsDropdownRef.current.contains(event.target)) {
         setIsDocumentsDropdownOpen(false);
       }
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('button[aria-label="Open navigation menu"]')) {
+      // Close mobile menu if click is outside the menu panel AND not on the toggle button itself
+      if (mobileMenuRef.current && 
+          !mobileMenuRef.current.contains(event.target) &&
+          !event.target.closest('button[aria-label*="navigation menu"]') // Check if click is on toggle
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
@@ -57,6 +61,11 @@ export default function Header() {
   const isActive = (path) => {
     return location.pathname === path;
   };
+  
+  // Function to specifically toggle the mobile menu
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(prev => !prev);
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -65,20 +74,21 @@ export default function Header() {
           <Link 
             to="/" 
             className="text-2xl font-bold text-primary hover:text-blue-600 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg" 
-            onClick={closeAllDropdowns}
+            onClick={closeAllDropdowns} // Close all if home is clicked
             aria-label="Guruvela Home"
           >
             Guruvela
           </Link>
 
+          {/* Mobile Menu Toggle Button */}
           <div className="md:hidden">
             <button
               type="button"
-              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              onClick={toggleMobileMenu} // Use the specific toggle function
               className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors duration-150"
               aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
+              aria-controls="mobile-menu-panel" // Ensure this matches the id of the panel
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
@@ -90,17 +100,20 @@ export default function Header() {
             </button>
           </div>
 
+          {/* Navigation Links Panel (Mobile Menu Panel) */}
           <div 
-            id="mobile-menu"
-            ref={mobileMenuRef}
+            id="mobile-menu-panel" // Added ID for aria-controls
+            ref={mobileMenuRef}  // Assign ref to the panel itself
             className={`
-              absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none md:static md:w-auto md:flex md:items-center md:space-x-3
+              absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none 
+              md:static md:w-auto md:flex md:items-center md:space-x-1 lg:space-x-3 
               ${isMobileMenuOpen ? 'block' : 'hidden'}
               transition-all duration-300 ease-in-out z-40 
               md:p-0
             `}
           >
-            <div className="flex flex-col md:flex-row md:items-center md:space-x-3 px-4 py-2 md:p-0">
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-1 lg:space-x-3 px-4 py-2 md:p-0">
+              {/* Predictor Dropdown */}
               <div className="relative py-2 md:py-0" ref={predictorDropdownRef}>
                 <button
                   type="button"
@@ -123,7 +136,7 @@ export default function Header() {
                     <Link 
                       to="/rank-predictor" 
                       className={`block px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 ${isActive('/rank-predictor') ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
-                      onClick={closeAllDropdowns}
+                      onClick={closeAllDropdowns} // Close all when a link is clicked
                       role="menuitem"
                     >
                       JoSAA Predictor
@@ -131,7 +144,7 @@ export default function Header() {
                     <Link 
                       to="/csab-predictor" 
                       className={`block px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 ${isActive('/csab-predictor') ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
-                      onClick={closeAllDropdowns}
+                      onClick={closeAllDropdowns} // Close all
                       role="menuitem"
                     >
                       CSAB Predictor
@@ -140,6 +153,7 @@ export default function Header() {
                 )}
               </div>
               
+              {/* Documents Dropdown */}
               <div className="relative py-2 md:py-0" ref={documentsDropdownRef}>
                 <button
                   type="button"
@@ -162,7 +176,7 @@ export default function Header() {
                     <Link
                       to="/josaa-documents"
                       className={`block px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-150 ${isActive('/josaa-documents') ? 'text-primary bg-gray-50' : 'text-gray-700'}`}
-                      onClick={closeAllDropdowns}
+                      onClick={closeAllDropdowns} // Close all
                       role="menuitem"
                     >
                       JoSAA Documents
@@ -172,7 +186,7 @@ export default function Header() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150"
-                      onClick={closeAllDropdowns}
+                      onClick={closeAllDropdowns} // Close all
                       role="menuitem"
                     >
                       CSAB Documents
@@ -182,9 +196,9 @@ export default function Header() {
               </div>
 
               <Link 
-                to="/preference-guides"  // New Link for Preference Guides
+                to="/preference-guides"
                 className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/preference-guides') ? 'nav-link-active bg-gray-50' : ''}`}
-                onClick={closeAllDropdowns}
+                onClick={closeAllDropdowns} // Close all
               >
                 Preference Guides
               </Link>
@@ -192,32 +206,33 @@ export default function Header() {
               <Link 
                 to="/mentors" 
                 className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/mentors') ? 'nav-link-active bg-gray-50' : ''}`}
-                onClick={closeAllDropdowns}
+                onClick={closeAllDropdowns} // Close all
               >
                 Mentors
               </Link>
               <Link 
                 to="/about-us" 
                 className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/about-us') ? 'nav-link-active bg-gray-50' : ''}`}
-                onClick={closeAllDropdowns}
+                onClick={closeAllDropdowns} // Close all
               >
                 About
               </Link>
               <Link 
                 to="/how-to-use" 
                 className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/how-to-use') ? 'nav-link-active bg-gray-50' : ''}`}
-                onClick={closeAllDropdowns}
+                onClick={closeAllDropdowns} // Close all
               >
                 How to Use
               </Link>
               <Link 
                 to="/faqs" 
                 className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/faqs') ? 'nav-link-active bg-gray-50' : ''}`}
-                onClick={closeAllDropdowns}
+                onClick={closeAllDropdowns} // Close all
               >
                 FAQ & Guides
               </Link>
 
+              {/* Language Dropdown */}
               <div className="relative py-2 md:py-0" ref={langDropdownRef}>
                 <button
                   type="button"
@@ -248,7 +263,7 @@ export default function Header() {
                     {supportedLanguages.map((langCode) => (
                       <button 
                         key={langCode} 
-                        onClick={() => handleLanguageChange(langCode)}
+                        onClick={() => handleLanguageChange(langCode)} // Uses specific handler
                         className={`block w-full text-left px-4 py-2 text-sm transition-colors duration-150
                           ${language === langCode ? 'bg-primary text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-primary'}`}
                         role="menuitem"

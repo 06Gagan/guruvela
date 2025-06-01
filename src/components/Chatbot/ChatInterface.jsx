@@ -80,6 +80,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const { language } = useLanguage();
   const chatEndRef = useRef(null);
+  const initialLoadDoneRef = useRef(false);
 
   const [currentCategories, setCurrentCategories] = useState([]);
   const [currentUiText, setCurrentUiText] = useState(uiTranslations.en);
@@ -91,7 +92,7 @@ export default function ChatInterface() {
 
     const translatedCategories = initialCategoriesBase.map(cat => ({
       ...cat,
-      label: langTrans[cat.labelKey] || cat.defaultLabel, 
+      label: langTrans[cat.labelKey] || cat.defaultLabel,
       exampleQuery: langTrans[cat.queryKey] || cat.defaultExampleQuery,
     }));
     setCurrentCategories(translatedCategories);
@@ -103,13 +104,18 @@ export default function ChatInterface() {
       relatedContent: null,
       showHowToUseSuggestion: false,
     }]);
+    initialLoadDoneRef.current = false;
   }, [language]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 0);
-    return () => clearTimeout(timer);
+    if (initialLoadDoneRef.current && chatHistory.length > 1) {
+      const timer = setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
+      return () => clearTimeout(timer);
+    } else if (chatHistory.length > 0) {
+        initialLoadDoneRef.current = true;
+    }
   }, [chatHistory]);
 
   const handleClosePredictorPromo = () => {
@@ -127,10 +133,10 @@ export default function ChatInterface() {
       } else {
         const searchTerms = userMessage.toLowerCase().split(' ').filter(term => term.length > 1 && term.length < 25);
         if (searchTerms.length === 0) {
-          return { 
-            content: langTrans.askSpecific, 
-            relatedContent: null, 
-            showHowToUseSuggestion: true 
+          return {
+            content: langTrans.askSpecific,
+            relatedContent: null,
+            showHowToUseSuggestion: true
           };
         }
         const keywordConditions = searchTerms.map(term => `question_keywords.cs.{${term.trim().replace(/'/g, "''")}}`).join(',');
@@ -139,7 +145,7 @@ export default function ChatInterface() {
       }
       let { data, error } = await queryBuilder;
       if (error || !data || (Array.isArray(data) && data.length === 0) ) {
-        if (currentLang !== 'en') { 
+        if (currentLang !== 'en') {
           if (clickedSuggestion) {
             queryBuilder = supabase.from('fixed_responses').select('answer_text, related_content_slug').eq('topic_id', clickedSuggestion.topicId).eq('language', 'en').single();
           } else {
@@ -153,31 +159,31 @@ export default function ChatInterface() {
             const { data: enData, error: enError } = await queryBuilder;
             if (!enError && enData && ( (Array.isArray(enData) && enData.length > 0) || (!Array.isArray(enData) && enData) ) ) {
               const responseData = Array.isArray(enData) ? enData[0] : enData;
-              return { 
-                content: `${responseData.answer_text} ${langTrans.englishFallbackNotice}`, 
+              return {
+                content: `${responseData.answer_text} ${langTrans.englishFallbackNotice}`,
                 relatedContent: responseData.related_content_slug,
-                showHowToUseSuggestion: responseData.related_content_slug === 'josaa-comprehensive-faq' 
+                showHowToUseSuggestion: responseData.related_content_slug === 'josaa-comprehensive-faq'
               };
             }
           }
         }
-        return { 
-          content: langTrans.fallbackResponse, 
-          relatedContent: 'josaa-comprehensive-faq', 
-          showHowToUseSuggestion: true 
+        return {
+          content: langTrans.fallbackResponse,
+          relatedContent: 'josaa-comprehensive-faq',
+          showHowToUseSuggestion: true
         };
       }
       const responseData = Array.isArray(data) ? data[0] : data;
-      return { 
-        content: responseData.answer_text, 
+      return {
+        content: responseData.answer_text,
         relatedContent: responseData.related_content_slug,
-        showHowToUseSuggestion: false 
+        showHowToUseSuggestion: false
       };
     } catch (catchError) {
-      return { 
-        content: langTrans.connectionError, 
+      return {
+        content: langTrans.connectionError,
         relatedContent: null,
-        showHowToUseSuggestion: true 
+        showHowToUseSuggestion: true
       };
     }
   };
@@ -200,17 +206,17 @@ export default function ChatInterface() {
         newBotMessage.suggestions = currentCategories;
     }
     setChatHistory(prev => {
-      const updatedHistory = prev.map(msg => ({ 
-        ...msg, 
-        suggestions: null, 
-        showHowToUseSuggestion: msg.showHowToUseSuggestion 
+      const updatedHistory = prev.map(msg => ({
+        ...msg,
+        suggestions: null,
+        showHowToUseSuggestion: msg.showHowToUseSuggestion
       }));
       return [...updatedHistory, userMessageObject, newBotMessage];
     });
     if (!directMessage) setMessage('');
     setIsLoading(false);
   };
-  
+
   const getLearnMoreLinkPath = (slug) => {
     if (slug === 'josaa-comprehensive-faq') {
       return '/faqs';
@@ -219,22 +225,23 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    // Make this outer div a flex container that grows to fill available vertical space
+    <div className="max-w-4xl mx-auto flex-grow flex flex-col"> 
       {showPredictorPromo && (
         <div className="relative bg-gray-100 border border-gray-200 p-3 sm:p-4 mb-4 rounded-lg shadow flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
           <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-0 sm:mr-4">
             {currentUiText.predictorPopupText}
           </p>
-          <Link 
+          <Link
             to="/rank-predictor"
             className="btn-primary py-1.5 px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
             onClick={handleClosePredictorPromo}
           >
             {currentUiText.goToPredictorButton}
           </Link>
-          <button 
-            onClick={handleClosePredictorPromo} 
-            className="absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-600 sm:static sm:ml-2" // Adjusted for better mobile placement
+          <button
+            onClick={handleClosePredictorPromo}
+            className="absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-600 sm:static sm:ml-2"
             aria-label="Close predictor promotion"
           >
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -244,29 +251,33 @@ export default function ChatInterface() {
         </div>
       )}
 
-      <div className="card h-[calc(100vh-200px)] sm:h-[600px] flex flex-col">
-        <div 
+      {/* Make the card grow to fill space from parent (flex-1), 
+        remain a flex column, and hide its own overflow.
+        Remove fixed height h-[calc(100vh-200px)] sm:h-[600px]
+      */}
+      <div className="card flex-1 flex flex-col overflow-hidden">
+        <div
           className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
           role="log"
           aria-label="Chat messages"
         >
           {chatHistory.map((msg, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
               role={msg.type === 'user' ? 'user-message' : 'bot-message'}
             >
-              <div 
+              <div
                 className={`max-w-[80%] rounded-lg p-4 shadow-sm transition-all duration-200
-                  ${msg.type === 'user' 
-                    ? 'bg-primary text-white hover:shadow-md' 
+                  ${msg.type === 'user'
+                    ? 'bg-primary text-white hover:shadow-md'
                     : 'bg-gray-50 text-gray-800 hover:shadow-md border border-gray-100'}`}
               >
                 <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                
+
                 {msg.type === 'bot' && msg.relatedContent && (
-                  <Link 
-                    to={getLearnMoreLinkPath(msg.relatedContent)} 
+                  <Link
+                    to={getLearnMoreLinkPath(msg.relatedContent)}
                     className="mt-3 inline-flex items-center text-sm text-accent hover:text-accent-dark transition-colors duration-150"
                   >
                     {currentUiText.learnMore}
@@ -279,8 +290,8 @@ export default function ChatInterface() {
                 {msg.type === 'bot' && msg.showHowToUseSuggestion && (
                   <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
                     {currentUiText.howToUseReferralPrefix}
-                    <Link 
-                      to="/how-to-use" 
+                    <Link
+                      to="/how-to-use"
                       className="text-accent hover:text-accent-dark font-medium hover:underline transition-colors duration-150"
                     >
                       {currentUiText.howToUseReferralLinkText}
@@ -297,9 +308,9 @@ export default function ChatInterface() {
                         <button
                           key={suggestion.id}
                           onClick={() => handleSubmit(null, suggestion.exampleQuery)}
-                          className="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-full 
-                                   text-gray-700 hover:bg-gray-50 hover:border-gray-300 
-                                   focus:outline-none focus:ring-2 focus:ring-primary/50 
+                          className="px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-full
+                                   text-gray-700 hover:bg-gray-50 hover:border-gray-300
+                                   focus:outline-none focus:ring-2 focus:ring-primary/50
                                    transition-all duration-200"
                           disabled={isLoading}
                         >
@@ -316,6 +327,7 @@ export default function ChatInterface() {
         </div>
 
         <div className="border-t border-gray-200 p-4 bg-white">
+          {/* Form area, fixed height */}
           <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
