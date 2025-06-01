@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export default function JosaaDocumentsPage() { // Added default here
+export default function JosaaDocumentsPage() {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ export default function JosaaDocumentsPage() { // Added default here
     en: {
       title: "JoSAA Official Documents",
       description: "Important official documents related to JoSAA counseling.",
-      disclaimer: "Please note: All formats and documents listed here are sourced from the official JoSAA website and are provided for informational purposes only.",
+      disclaimer: "Please note: All formats and documents listed here are sourced from the official JoSAA website and are provided for informational purposes only. Always refer to the latest official JoSAA portal for the most current and authoritative versions.",
       docNameHeader: "Document Title",
       descriptionHeader: "Description",
       linkHeaderText: "View/Download",
@@ -24,7 +24,7 @@ export default function JosaaDocumentsPage() { // Added default here
     'hi-en': {
       title: "JoSAA ke Official Documents",
       description: "JoSAA counselling se jude zaroori official documents.",
-      disclaimer: "Kripya dhyaan dein: Yahan di gayi sabhi formats aur documents official JoSAA website se li gayi hain aur keval information ke liye hain..",
+      disclaimer: "Kripya dhyaan dein: Yahan di gayi sabhi formats aur documents official JoSAA website se li gayi hain aur केवल सूचना ke liye hain. Hamesha sabse current aur authoritative versions ke liye official JoSAA portal check karein.",
       docNameHeader: "Document ka Naam",
       descriptionHeader: "Vivaran",
       linkHeaderText: "Dekhein/Download Karein",
@@ -34,7 +34,7 @@ export default function JosaaDocumentsPage() { // Added default here
     'te-en': {
       title: "JoSAA Official Documents",
       description: "JoSAA counselling ki sambandhinchina mukhyamaina official documents.",
-      disclaimer: "Dayachesi gamaninchandi: Ikkada suchinchabadina anni formatlu mariyu documentlu official JoSAA website nundi grahinchabadinavi mariyu kevalam samacharam koraku matrame ivvabadinavi.",
+      disclaimer: "Dayachesi gamaninchandi: Ikkada suchinchabadina anni formatlu mariyu documentlu official JoSAA website nundi grahinchabadinavi mariyu kevalam samacharam koraku matrame ivvabadinavi. Ati venta update ayina mariyu adhikarikamaina versionla koraku official JoSAA portal nu chudandi.",
       docNameHeader: "Document Peru",
       descriptionHeader: "Vivaraṇa",
       linkHeaderText: "Chudu/Download Cheyi",
@@ -106,6 +106,7 @@ export default function JosaaDocumentsPage() { // Added default here
               <thead className="bg-gray-100">
                 <tr>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{uiText.docNameHeader}</th>
+                  {/* Description header is only for sm screens and up */}
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">{uiText.descriptionHeader}</th>
                   <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
                 </tr>
@@ -113,16 +114,26 @@ export default function JosaaDocumentsPage() { // Added default here
               <tbody className="bg-white divide-y divide-gray-200">
                 {documents.map((doc) => (
                   <tr key={doc.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">{doc.title}</td>
+                    {/* Cell for Title and Mobile Description */}
+                    <td className="px-4 py-4 whitespace-normal text-sm font-medium text-gray-900">
+                      {doc.title}
+                      {/* Description for mobile (xs screens), shown only if it exists */}
+                      {doc.description && (
+                        <p className="mt-1 text-xs text-gray-500 block sm:hidden">
+                          {doc.description}
+                        </p>
+                      )}
+                    </td>
+                    {/* Description cell for sm screens and up */}
                     <td className="px-4 py-4 whitespace-normal text-sm text-gray-600 hidden sm:table-cell">
-                      {doc.description || '-'}
+                      {doc.description || ''}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-center">
                       <a
                         href={doc.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-primary py-1.5 px-3 text-xs inline-flex items-center"
+                        className="btn-primary py-1.5 px-3 text-xs inline-flex items-center" 
                       >
                         {uiText.linkHeaderText}
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
