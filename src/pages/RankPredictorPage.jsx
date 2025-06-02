@@ -137,13 +137,13 @@ export default function RankPredictorPage() {
               id="rank"
               value={rank}
               onChange={(e) => setRank(e.target.value)}
-              placeholder={examType === "JEE Advanced" ? "Enter Category Rank" : "Enter CRL Rank"}
+              placeholder={examType === "JEE Advanced" ? "Enter Category Rank" : "Category Rank"}
               required
               className="form-input"
               aria-describedby="rank-description"
             />
             <p id="rank-description" className="text-xs text-gray-500 mt-1">
-             {examType === "JEE Advanced" ? "Enter your JEE Advanced Category Rank." : "Enter your JEE Main CRL (Common Rank List)."}
+             {examType === "JEE Advanced" ? "Enter your JEE Advanced Category Rank." : "Enter your JEE Main Category Rank."}
             </p>
           </div>
 
