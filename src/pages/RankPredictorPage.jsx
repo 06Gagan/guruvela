@@ -8,7 +8,7 @@ export default function RankPredictorPage() {
   const [rank, setRank] = useState('');
   const [examType, setExamType] = useState('JEE Main');
   const [category, setCategory] = useState('OPEN');
-  const [quota, setQuota] = useState('');
+  const [quota, setQuota] = useState('HS'); // Default to 'HS' for JEE Main
   const [gender, setGender] = useState('Gender-Neutral');
   const [isPreparatoryRank, setIsPreparatoryRank] = useState(false);
 
@@ -22,7 +22,7 @@ export default function RankPredictorPage() {
   const preparatoryGuideLink = "/pages/iit-preparatory-courses-guide";
 
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
-  const quotaOptions = {
+  const baseQuotaOptions = { // Renamed to avoid conflict if needed, and AI is kept for definition
     'JEE Main': ["AI", "HS", "OS", "GO"],
     'JEE Advanced': ["AI"]
   };
@@ -48,20 +48,14 @@ export default function RankPredictorPage() {
     if (examType === 'JEE Advanced') {
       setQuota('AI');
     } else if (examType === 'JEE Main') {
-      const mainExamQuotas = quotaOptions['JEE Main'];
-      if (!mainExamQuotas.includes(quota)) {
-        setQuota(mainExamQuotas[0] || '');
+      // If current quota is 'AI' (e.g., switched from Advanced) or not a valid Main quota,
+      // set to the first valid Main quota (excluding AI).
+      const validMainQuotas = (baseQuotaOptions['JEE Main'] || []).filter(q => q !== 'AI');
+      if (quota === 'AI' || !validMainQuotas.includes(quota)) {
+        setQuota(validMainQuotas[0] || 'HS'); // Default to HS or the first available non-AI
       }
     }
-  }, [examType, quota]);
-
-  useEffect(() => {
-    if (examType === 'JEE Main') {
-      setQuota(quotaOptions['JEE Main'][0] || 'AI'); 
-    } else if (examType === 'JEE Advanced') {
-      setQuota('AI');
-    }
-  }, []);
+  }, [examType]); // Rerun only when examType changes
 
 
   const handleSubmit = async (e) => {
@@ -98,6 +92,10 @@ export default function RankPredictorPage() {
       setIsLoading(false);
     }
   };
+  
+  const currentQuotaOptions = examType === 'JEE Main' 
+    ? (baseQuotaOptions['JEE Main'] || []).filter(opt => opt !== 'AI') 
+    : (baseQuotaOptions['JEE Advanced'] || []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -118,7 +116,6 @@ export default function RankPredictorPage() {
         <p className="text-gray-600">Find potential colleges based on JoSAA cutoffs</p>
       </div>
 
-      {/* Banner for Preference Guides - Made more compact */}
       <div className="my-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm flex flex-col sm:flex-row justify-between items-center gap-2 shadow-sm">
         <p className="text-blue-700">{uiText.preferenceGuideTextShort}</p>
         <Link to="/preference-guides" className="btn-primary bg-blue-600 hover:bg-blue-700 text-xs py-1 px-3 whitespace-nowrap">
@@ -137,14 +134,11 @@ export default function RankPredictorPage() {
               id="rank"
               value={rank}
               onChange={(e) => setRank(e.target.value)}
-              placeholder={examType === "JEE Advanced" ? "Enter Category Rank" : "Category Rank"}
+              placeholder={examType === "JEE Advanced" ? "Enter Category Rank" : "Enter Category Rank"}
               required
               className="form-input"
               aria-describedby="rank-description"
             />
-            <p id="rank-description" className="text-xs text-gray-500 mt-1">
-             {examType === "JEE Advanced" ? "Enter your JEE Advanced Category Rank." : "Enter your JEE Main Category Rank."}
-            </p>
           </div>
 
           <div>
@@ -184,7 +178,7 @@ export default function RankPredictorPage() {
               disabled={examType === 'JEE Advanced'}
               aria-describedby="quota-description"
             >
-              {(quotaOptions[examType] || []).map(opt => (
+              {currentQuotaOptions.map(opt => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
@@ -260,7 +254,6 @@ export default function RankPredictorPage() {
         </div>
       </form>
 
-      {/* ... rest of the component (loading, error, results table) ... */}
       {isLoading && (
         <div className="text-center py-8">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
