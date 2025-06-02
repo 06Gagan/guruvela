@@ -13,9 +13,10 @@ import MentorsPage from './pages/MentorsPage';
 import HowToUsePage from './pages/HowToUsePage';
 import AboutUsPage from './pages/AboutUsPage';
 import JosaaDocumentsPage from './pages/JosaaDocumentsPage';
-import PreferenceGuidesPage from './pages/PreferenceGuidesPage'; // Import the new page
+import PreferenceGuidesPage from './pages/PreferenceGuidesPage';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react"; // Import Vercel Analytics
 
 const router = createBrowserRouter([
   {
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
         element: <JosaaDocumentsPage />
       },
       {
-        path: "preference-guides", // Add new route for preference guides
+        path: "preference-guides", 
         element: <PreferenceGuidesPage />
       },
       {
@@ -71,6 +72,7 @@ function App() {
     <LanguageProvider>
       <RouterProvider router={router} />
       <SpeedInsights />
+      <Analytics /> {/* Add the Analytics component here */}
     </LanguageProvider>
   );
 }
