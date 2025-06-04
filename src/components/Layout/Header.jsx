@@ -244,7 +244,14 @@ export default function Header() {
                   aria-controls="language-dropdown"
                 >
                   <span className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-1"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
                       <path d="M10 2a8 8 0 015.036 13.561l-1.414-1.414A6 6 0 1010 4V2z" />
                       <path d="M10 2C5.029 2 1 6.03 1 11s4.029 9 9 9c2.905 0 5.513-1.379 7.238-3.595L15.5 14.5A7.001 7.001 0 0010 18c-3.866 0-7-3.134-7-7s3.134-7 7-7a7.001 7.001 0 014.595 1.738l1.778-1.778A8.965 8.965 0 0010 2zm8 5a1 1 0 00-1-1h-4a1 1 0 000 2h1.586l-2.627 2.627a1 1 0 101.414 1.414L16 10.414V12a1 1 0 002 0V7a1 1 0 00-1-1z" />
                     </svg>
