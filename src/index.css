@@ -23,13 +23,13 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary text-white hover:bg-blue-600 
-           focus:ring-primary/50 active:bg-blue-700;
+    @apply btn bg-primary text-white hover:bg-blue-700
+           focus:ring-primary/50 active:bg-blue-800;
   }
 
   .btn-accent {
-    @apply btn bg-accent text-white hover:bg-orange-600 
-           focus:ring-accent/50 active:bg-orange-700;
+    @apply btn bg-accent text-white hover:bg-orange-800
+           focus:ring-accent/50 active:bg-orange-900;
   }
 
   .btn-outline {
