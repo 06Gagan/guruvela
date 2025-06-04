@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#3B82F6',    // blue-500
-        accent: '#F97316',     // orange-500
+        primary: '#2563EB',    // blue-600
+        accent: '#C2410C',     // orange-700
         'accent-alt': '#10B981', // emerald-500
       },
       fontFamily: {
