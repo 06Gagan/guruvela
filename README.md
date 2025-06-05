@@ -26,3 +26,21 @@ the following category keywords are understood (case-insensitive):
 - **SC (PwD)**: `sc pwd`, `sc-pwd`
 - **ST**: `st`
 - **ST (PwD)**: `st pwd`, `st-pwd`
+
+## Environment Variables
+
+Access to college prediction data relies on a Supabase backend. Create a `.env`
+file in the project root and provide the following variables:
+
+```bash
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_JOSAA_YEAR=2024
+VITE_JOSAA_ROUND=6
+VITE_CSAB_YEAR=2024
+VITE_CSAB_ROUND=2
+```
+
+Replace the placeholders with the values from your Supabase project. Without
+these values the chatbot will respond with a fallback message because it cannot
+fetch prediction data.
