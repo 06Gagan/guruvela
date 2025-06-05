@@ -1,6 +1,8 @@
 // src/components/Chatbot/ChatInterface.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -179,7 +181,7 @@ export default function ChatInterface() {
         relatedContent: responseData.related_content_slug,
         showHowToUseSuggestion: false
       };
-    } catch (catchError) {
+    } catch {
       return {
         content: langTrans.connectionError,
         relatedContent: null,
@@ -273,7 +275,23 @@ export default function ChatInterface() {
                     ? 'bg-primary text-white hover:shadow-md'
                     : 'bg-gray-50 text-gray-800 hover:shadow-md border border-gray-100'}`}
               >
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                <ReactMarkdown
+                  className="prose max-w-none whitespace-pre-wrap leading-relaxed"
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    a: ({ ...props }) => (
+                      <a
+                        {...props}
+                        className="text-accent underline hover:text-accent-dark"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                  }}
+                  linkTarget="_blank"
+                >
+                  {msg.content}
+                </ReactMarkdown>
 
                 {msg.type === 'bot' && msg.relatedContent && (
                   <Link
