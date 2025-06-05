@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "tailwind:init": "tailwindcss init -p"
+    "tailwind:init": "tailwindcss init -p",
+    "test": "node tests/parseCollegeQuery.test.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

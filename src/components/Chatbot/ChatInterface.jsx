@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { parseCollegeQuery } from '../../lib/parseCollegeQuery';
 
 const initialCategoriesBase = [
   { id: 'cat_josaa_docs', topicId: 'josaa_documents_general', labelKey: 'documentsLabel', queryKey: 'documentsQuery' },
@@ -13,32 +14,6 @@ const initialCategoriesBase = [
   { id: 'cat_colorblind', topicId: 'josaa_colorblind_general', labelKey: 'colorblindLabel', queryKey: 'colorblindQuery' },
 ];
 
-const categoryMap = {
-  obc: 'OBC-NCL',
-  'obc ncl': 'OBC-NCL',
-  sc: 'SC',
-  st: 'ST',
-  ews: 'EWS',
-  gen: 'OPEN',
-  general: 'OPEN',
-  open: 'OPEN'
-};
-
-function parseCollegeQuery(text) {
-  const lower = text.toLowerCase();
-  const rankMatch = lower.match(/\b(\d{3,})\b/);
-  const rank = rankMatch ? parseInt(rankMatch[1], 10) : null;
-  let category = null;
-  for (const key of Object.keys(categoryMap)) {
-    if (lower.includes(key)) { category = categoryMap[key]; break; }
-  }
-  const branchMatch = text.match(/\b(CSE|Computer Science|ECE|Electrical|Electronics|Mechanical|Civil|IT|Information Technology)\b/i);
-  const branch = branchMatch ? branchMatch[0] : null;
-  const instituteMatch = text.match(/(?:at|in|for)\s+([A-Za-z ]*(?:IIT|NIT|IIIT)[A-Za-z ]*)/i);
-  const institute = instituteMatch ? instituteMatch[1].trim() : null;
-  const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
-  return { rank, category, branch, institute, isCollegeQuery };
-}
 
 async function fetchCollegePredictions({ rank, category, branch, institute }) {
   try {
@@ -358,7 +333,8 @@ export default function ChatInterface() {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    a: ({node, ...props}) => (
+                    // eslint-disable-next-line no-unused-vars
+                    a: ({ node, ...props }) => (
                       <a
                         {...props}
                         target="_blank"
