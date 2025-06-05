@@ -1,5 +1,9 @@
 import { supabase } from './supabase';
 
+const hasSupabaseCreds =
+  Boolean(import.meta.env.VITE_SUPABASE_URL) &&
+  Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY);
+
 export async function fetchCollegePredictions({
   rank,
   examType,
@@ -12,6 +16,12 @@ export async function fetchCollegePredictions({
   const userRankInt = parseInt(rank);
   if (isNaN(userRankInt) || userRankInt <= 0) {
     throw new Error('Invalid rank');
+  }
+
+  if (!hasSupabaseCreds) {
+    throw new Error(
+      'Supabase credentials are missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.'
+    );
   }
 
   let query = supabase
