@@ -1,6 +1,6 @@
 // src/pages/RankPredictorPage.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
 import {
   JOSAA_PREDICTION_YEAR,
@@ -20,6 +20,8 @@ export default function RankPredictorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
+  const location = useLocation();
+  const [autoTrigger, setAutoTrigger] = useState(false);
 
   const { language } = useLanguage();
 
@@ -49,6 +51,18 @@ export default function RankPredictorPage() {
   };
   const uiText = pageTranslations[language] || pageTranslations.en;
 
+  // Parse query params for pre-filled values
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const r = params.get('rank');
+    const c = params.get('cat');
+    const exam = params.get('exam');
+    if (r) setRank(r);
+    if (c) setCategory(c);
+    if (exam) setExamType(exam);
+    if (r && c && exam) setAutoTrigger(true);
+  }, [location.search]);
+
   useEffect(() => {
     if (examType === 'JEE Advanced') {
       setQuota('AI');
@@ -67,6 +81,13 @@ export default function RankPredictorPage() {
       setQuota('AI');
     }
   }, []);
+
+  useEffect(() => {
+    if (autoTrigger) {
+      handleSubmit(null);
+      setAutoTrigger(false);
+    }
+  }, [autoTrigger]);
 
 
   const handleSubmit = async (e) => {

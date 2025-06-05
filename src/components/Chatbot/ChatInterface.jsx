@@ -17,7 +17,7 @@ const initialCategoriesBase = [
 
 
 async function fetchCollegePredictions(
-  { rank, category, branch, institute },
+  { rank, category, branch, institute, examType },
   { year = JOSAA_PREDICTION_YEAR, round = JOSAA_PREDICTION_ROUND } = {}
 ) {
   try {
@@ -26,7 +26,7 @@ async function fetchCollegePredictions(
       .select('institute_name, branch_name, closing_rank')
       .eq('year', year)
       .eq('round_no', round)
-      .eq('exam_type', 'JEE Main')
+      .eq('exam_type', examType || 'JEE Main')
       .eq('seat_type', category)
       .gte('closing_rank', rank);
 
@@ -64,7 +64,7 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Here are the top 3 colleges you might get based on your rank and category:",
     viewFullListText: "View Full List on Guruvela",
-    clarifyMissingInfo: "Can you tell me your JEE rank and category (General, OBC, SC, etc.)?"
+    clarifyMissingInfo: "Can you tell me your JEE rank, category (General, OBC, SC, etc.) and exam type (Main or Advanced)?"
   },
   'hi-en': {
     greeting: "Namaste! Main Guruvela ka assistant hoon. JoSAA/CSAB counselling mein aapki kya help kar sakta hoon?",
@@ -87,7 +87,7 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Yeh hain top 3 colleges jo aapke rank aur category ke hisaab se mil sakte hain:",
     viewFullListText: "Puri list Guruvela par dekhein",
-    clarifyMissingInfo: "Kya aap apna JEE rank aur category bata sakte hain (General, OBC, SC, etc.)?"
+    clarifyMissingInfo: "Kya aap apna JEE rank, category (General, OBC, SC, etc.) aur exam type bata sakte hain?"
   },
   'te-en': {
     greeting: "Namaste! Nenu Guruvela assistant. JoSAA/CSAB counselling lo ela help cheyagalanu?",
@@ -110,7 +110,7 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Mee rank mariyu category ni base cheskoni meeku dorakachu anukune top 3 colleges:",
     viewFullListText: "Full list Guruvela lo chudandi",
-    clarifyMissingInfo: "Mee JEE rank mariyu category (General, OBC, SC, etc.) cheppagalara?"
+    clarifyMissingInfo: "Mee JEE rank, category (General, OBC, SC, etc.) mariyu exam type cheppagalara?"
   }
 };
 
@@ -238,7 +238,7 @@ export default function ChatInterface() {
     const parsed = parseCollegeQuery(currentMessageText);
     let response;
     if (parsed.isCollegeQuery) {
-      if (!parsed.rank || !parsed.category) {
+      if (!parsed.rank || !parsed.category || !parsed.examType) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
       } else {
         const colleges = await fetchCollegePredictions(parsed, {
@@ -247,7 +247,7 @@ export default function ChatInterface() {
         });
         if (colleges.length > 0) {
           const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
-          const link = `https://guruvela.in/college-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
+          const link = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&exam=${encodeURIComponent(parsed.examType)}`;
           response = {
             content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
             relatedContent: null,

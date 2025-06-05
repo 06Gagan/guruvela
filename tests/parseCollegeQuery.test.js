@@ -11,6 +11,7 @@ assert.equal(result.rank, 5);
 
 result = parseCollegeQuery('I have a 4231 rank in jee main');
 assert.equal(result.rank, 4231);
+assert.equal(result.examType, 'JEE Main');
 
 result = parseCollegeQuery('I want 3 colleges');
 assert.equal(result.rank, null);
@@ -23,6 +24,12 @@ assert.equal(result.category, 'OPEN (PwD)');
 
 result = parseCollegeQuery('rank 100 ews-pwd');
 assert.equal(result.category, 'EWS (PwD)');
+
+result = parseCollegeQuery('my jee advanced rank is 4321 sc');
+assert.equal(result.examType, 'JEE Advanced');
+
+result = parseCollegeQuery('rank 50 obc');
+assert.equal(result.examType, null);
 
 console.log('All tests passed');
 

@@ -32,6 +32,15 @@ export const categoryMap = {
   open: 'OPEN'
 };
 
+export const examTypeMap = {
+  'jee main': 'JEE Main',
+  'jee mains': 'JEE Main',
+  'main exam': 'JEE Main',
+  'jee advanced': 'JEE Advanced',
+  'jee advance': 'JEE Advanced',
+  advanced: 'JEE Advanced'
+};
+
 export function parseCollegeQuery(text) {
   const lower = text.toLowerCase();
   let match =
@@ -51,6 +60,10 @@ export function parseCollegeQuery(text) {
   const branch = branchMatch ? branchMatch[0] : null;
   const instituteMatch = text.match(/(?:at|in|for)\s+([A-Za-z ]*(?:IIT|NIT|IIIT)[A-Za-z ]*)/i);
   const institute = instituteMatch ? instituteMatch[1].trim() : null;
+  let examType = null;
+  for (const [key, value] of Object.entries(examTypeMap)) {
+    if (lower.includes(key.toLowerCase())) { examType = value; break; }
+  }
   const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
-  return { rank, category, branch, institute, isCollegeQuery };
+  return { rank, category, branch, institute, examType, isCollegeQuery };
 }
