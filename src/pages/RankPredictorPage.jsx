@@ -15,6 +15,7 @@ export default function RankPredictorPage() {
   const [quota, setQuota] = useState('');
   const [gender, setGender] = useState('Gender-Neutral');
   const [isPreparatoryRank, setIsPreparatoryRank] = useState(false);
+  const [state, setState] = useState('');
 
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,18 +58,22 @@ export default function RankPredictorPage() {
     const rankParam = searchParams.get('rank');
     const catParam = searchParams.get('cat');
     const examParam = searchParams.get('examType');
+    const stateParam = searchParams.get('state');
+    const quotaParam = searchParams.get('quota');
     if (rankParam) setRank(rankParam);
     if (catParam) setCategory(catParam);
     if (examParam) setExamType(examParam);
-    if (rankParam && catParam && examParam) setAutoSearch(true);
+    if (stateParam) setState(stateParam);
+    if (quotaParam) setQuota(quotaParam);
+    if (rankParam && catParam && examParam && stateParam && quotaParam) setAutoSearch(true);
   }, []); // run once on mount
 
   useEffect(() => {
-    if (autoSearch && rank && category && examType) {
+    if (autoSearch && rank && category && examType && state && quota) {
       handleSubmit();
       setAutoSearch(false);
     }
-  }, [autoSearch, rank, category, examType]);
+  }, [autoSearch, rank, category, examType, state, quota]);
 
   useEffect(() => {
     if (examType === 'JEE Advanced') {
@@ -111,6 +116,7 @@ export default function RankPredictorPage() {
           quota,
           gender,
           isPreparatoryRank,
+          state,
         },
         { year: JOSAA_PREDICTION_YEAR, round: JOSAA_PREDICTION_ROUND }
       );

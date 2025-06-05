@@ -28,5 +28,11 @@ assert.equal(result.category, 'EWS (PwD)');
 result = parseCollegeQuery('rank 50 in jee advanced');
 assert.equal(result.examType, 'JEE Advanced');
 
+result = parseCollegeQuery("I'm from Maharashtra with rank 1500");
+assert.equal(result.state, 'Maharashtra');
+
+result = parseCollegeQuery('my state is karnataka');
+assert.equal(result.state, 'Karnataka');
+
 console.log('All tests passed');
 

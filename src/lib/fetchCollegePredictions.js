@@ -6,7 +6,8 @@ export async function fetchCollegePredictions({
   category,
   quota,
   gender,
-  isPreparatoryRank
+  isPreparatoryRank,
+  state
 }, { year = new Date().getFullYear(), round = 6 } = {}) {
   const userRankInt = parseInt(rank);
   if (isNaN(userRankInt) || userRankInt <= 0) {
@@ -21,7 +22,11 @@ export async function fetchCollegePredictions({
     .eq('exam_type', examType)
     .eq('seat_type', category);
 
-  if (quota) {
+  if (state && quota === 'HS') {
+    query = query.eq('state', state).eq('quota', 'HS');
+  } else if (state && quota === 'OS') {
+    query = query.neq('state', state).eq('quota', 'OS');
+  } else if (quota) {
     query = query.eq('quota', quota);
   }
 
