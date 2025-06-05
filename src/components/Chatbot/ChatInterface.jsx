@@ -260,7 +260,8 @@ export default function ChatInterface() {
             category,
             quota: quotaForExam,
             gender: 'Gender-Neutral',
-            isPreparatoryRank: false
+            isPreparatoryRank: false,
+            state: stateForPrediction,
           },
           {
             year: JOSAA_PREDICTION_YEAR,
