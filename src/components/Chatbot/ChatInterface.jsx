@@ -1,6 +1,8 @@
 // src/components/Chatbot/ChatInterface.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -273,7 +275,22 @@ export default function ChatInterface() {
                     ? 'bg-primary text-white hover:shadow-md'
                     : 'bg-gray-50 text-gray-800 hover:shadow-md border border-gray-100'}`}
               >
-                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    a: ({node, ...props}) => (
+                      <a
+                        {...props}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent underline"
+                      />
+                    )
+                  }}
+                  className="whitespace-pre-wrap leading-relaxed"
+                >
+                  {msg.content}
+                </ReactMarkdown>
 
                 {msg.type === 'bot' && msg.relatedContent && (
                   <Link
