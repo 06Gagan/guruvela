@@ -32,6 +32,48 @@ export const categoryMap = {
   open: 'OPEN'
 };
 
+export const stateKeywords = {
+  'andhra pradesh': 'Andhra Pradesh',
+  'arunachal pradesh': 'Arunachal Pradesh',
+  assam: 'Assam',
+  bihar: 'Bihar',
+  chhattisgarh: 'Chhattisgarh',
+  goa: 'Goa',
+  gujarat: 'Gujarat',
+  haryana: 'Haryana',
+  'himachal pradesh': 'Himachal Pradesh',
+  jammu: 'Jammu and Kashmir',
+  kashmir: 'Jammu and Kashmir',
+  jharkhand: 'Jharkhand',
+  karnataka: 'Karnataka',
+  kerala: 'Kerala',
+  'madhya pradesh': 'Madhya Pradesh',
+  maharashtra: 'Maharashtra',
+  manipur: 'Manipur',
+  meghalaya: 'Meghalaya',
+  mizoram: 'Mizoram',
+  nagaland: 'Nagaland',
+  odisha: 'Odisha',
+  orissa: 'Odisha',
+  punjab: 'Punjab',
+  rajasthan: 'Rajasthan',
+  sikkim: 'Sikkim',
+  'tamil nadu': 'Tamil Nadu',
+  telangana: 'Telangana',
+  tripura: 'Tripura',
+  'uttar pradesh': 'Uttar Pradesh',
+  uttarakhand: 'Uttarakhand',
+  'west bengal': 'West Bengal',
+  delhi: 'Delhi',
+  ladakh: 'Ladakh',
+  chandigarh: 'Chandigarh',
+  'andaman and nicobar': 'Andaman and Nicobar Islands',
+  'dadra and nagar haveli': 'Dadra and Nagar Haveli and Daman and Diu',
+  'daman and diu': 'Dadra and Nagar Haveli and Daman and Diu',
+  puducherry: 'Puducherry',
+  lakshadweep: 'Lakshadweep'
+};
+
 export function parseCollegeQuery(text) {
   const lower = text.toLowerCase();
   let match =
@@ -52,6 +94,12 @@ export function parseCollegeQuery(text) {
   const instituteMatch = text.match(/(?:at|in|for)\s+([A-Za-z ]*(?:IIT|NIT|IIIT)[A-Za-z ]*)/i);
   const institute = instituteMatch ? instituteMatch[1].trim() : null;
 
+  let state = null;
+  for (const [key, value] of Object.entries(stateKeywords)) {
+    const regex = new RegExp(`\\b${key}\\b`, 'i');
+    if (regex.test(lower)) { state = value; break; }
+  }
+
   let examType = null;
   if (/\bjee\s*advanced\b/.test(lower) || /\bjee[-\s]?adv\b/.test(lower)) {
     examType = 'JEE Advanced';
@@ -59,5 +107,5 @@ export function parseCollegeQuery(text) {
     examType = 'JEE Main';
   }
   const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
-  return { rank, category, branch, institute, examType, isCollegeQuery };
+  return { rank, category, branch, institute, state, examType, isCollegeQuery };
 }

@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { parseCollegeQuery } from '../../lib/parseCollegeQuery';
+import { fetchCollegePredictions as fetchPredictions } from '../../lib/fetchCollegePredictions';
 import { JOSAA_PREDICTION_YEAR, JOSAA_PREDICTION_ROUND } from '../../config/constants';
 
 const initialCategoriesBase = [
@@ -16,26 +17,9 @@ const initialCategoriesBase = [
 ];
 
 
-async function fetchCollegePredictions(
-  { rank, category, branch, institute },
-  { year = JOSAA_PREDICTION_YEAR, round = JOSAA_PREDICTION_ROUND } = {}
-) {
+async function fetchCollegePredictions(args, options = {}) {
   try {
-    let query = supabase
-      .from('college_cutoffs')
-      .select('institute_name, branch_name, closing_rank')
-      .eq('year', year)
-      .eq('round_no', round)
-      .eq('exam_type', 'JEE Main')
-      .eq('seat_type', category)
-      .gte('closing_rank', rank);
-
-    if (branch) query = query.ilike('branch_name', `%${branch}%`);
-    if (institute) query = query.ilike('institute_name', `%${institute}%`);
-
-    const { data, error } = await query.order('closing_rank', { ascending: true }).limit(3);
-    if (error) { console.error('Supabase error', error); return []; }
-    return data || [];
+    return await fetchPredictions(args, options);
   } catch (err) {
     console.error('Prediction fetch error', err);
     return [];
@@ -64,7 +48,8 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Here are the top 3 colleges you might get based on your rank and category:",
     viewFullListText: "View Full List on Guruvela",
-    clarifyMissingInfo: "Can you tell me your JEE rank and category (General, OBC, SC, etc.)?"
+    clarifyMissingInfo: "Can you tell me your JEE rank and category (General, OBC, SC, etc.)?",
+    askState: "Which state are you from?"
   },
   'hi-en': {
     greeting: "Namaste! Main Guruvela ka assistant hoon. JoSAA/CSAB counselling mein aapki kya help kar sakta hoon?",
@@ -87,7 +72,8 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Yeh hain top 3 colleges jo aapke rank aur category ke hisaab se mil sakte hain:",
     viewFullListText: "Puri list Guruvela par dekhein",
-    clarifyMissingInfo: "Kya aap apna JEE rank aur category bata sakte hain (General, OBC, SC, etc.)?"
+    clarifyMissingInfo: "Kya aap apna JEE rank aur category bata sakte hain (General, OBC, SC, etc.)?",
+    askState: "Aap kis rajya se hain?"
   },
   'te-en': {
     greeting: "Namaste! Nenu Guruvela assistant. JoSAA/CSAB counselling lo ela help cheyagalanu?",
@@ -110,7 +96,8 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Mee rank mariyu category ni base cheskoni meeku dorakachu anukune top 3 colleges:",
     viewFullListText: "Full list Guruvela lo chudandi",
-    clarifyMissingInfo: "Mee JEE rank mariyu category (General, OBC, SC, etc.) cheppagalara?"
+    clarifyMissingInfo: "Mee JEE rank mariyu category (General, OBC, SC, etc.) cheppagalara?",
+    askState: "Mee home state enti?"
   }
 };
 
@@ -125,6 +112,7 @@ export default function ChatInterface() {
   const [currentCategories, setCurrentCategories] = useState([]);
   const [currentUiText, setCurrentUiText] = useState(uiTranslations.en);
   const [showPredictorPromo, setShowPredictorPromo] = useState(true);
+  const [userState, setUserState] = useState('');
 
   useEffect(() => {
     const langTrans = uiTranslations[language] || uiTranslations.en;
@@ -236,35 +224,63 @@ export default function ChatInterface() {
     setIsLoading(true);
     const userMessageObject = { type: 'user', content: currentMessageText };
     const parsed = parseCollegeQuery(currentMessageText);
+    if (parsed.state) {
+      setUserState(parsed.state);
+    }
     let response;
     if (parsed.isCollegeQuery) {
       if (!parsed.rank || !parsed.category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
       } else {
-        const colleges = await fetchCollegePredictions(
-          {
-            rank: parsed.rank,
-            examType: parsed.examType || 'JEE Main',
-            category: parsed.category,
-            quota: '',
-            gender: 'Gender-Neutral',
-            isPreparatoryRank: false,
-          },
-          {
-            year: JOSAA_PREDICTION_YEAR,
-            round: JOSAA_PREDICTION_ROUND,
-          }
-        );
-        if (colleges.length > 0) {
-          const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
-          const link = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}`;
-          response = {
-            content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
-            relatedContent: null,
-            showHowToUseSuggestion: false
-          };
+        const stateForPrediction = parsed.state || userState;
+        if ((parsed.examType || 'JEE Main') === 'JEE Main' && !stateForPrediction) {
+          response = { content: currentUiText.askState, relatedContent: null, showHowToUseSuggestion: false };
         } else {
-          response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
+          const hsColleges = await fetchCollegePredictions(
+            {
+              rank: parsed.rank,
+              examType: parsed.examType || 'JEE Main',
+              category: parsed.category,
+              quota: 'HS',
+              gender: 'Gender-Neutral',
+              isPreparatoryRank: false,
+              state: stateForPrediction
+            },
+            {
+              year: JOSAA_PREDICTION_YEAR,
+              round: JOSAA_PREDICTION_ROUND,
+            }
+          );
+          const osColleges = await fetchCollegePredictions(
+            {
+              rank: parsed.rank,
+              examType: parsed.examType || 'JEE Main',
+              category: parsed.category,
+              quota: 'OS',
+              gender: 'Gender-Neutral',
+              isPreparatoryRank: false,
+              state: stateForPrediction
+            },
+            {
+              year: JOSAA_PREDICTION_YEAR,
+              round: JOSAA_PREDICTION_ROUND,
+            }
+          );
+          const colleges = [...hsColleges, ...osColleges]
+            .sort((a, b) => a.closing_rank - b.closing_rank)
+            .slice(0, 10);
+          if (colleges.length > 0) {
+            const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
+            const linkHS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=HS`;
+            const linkOS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=OS`;
+            response = {
+              content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText} HS](${linkHS}) | [${currentUiText.viewFullListText} OS](${linkOS})`,
+              relatedContent: null,
+              showHowToUseSuggestion: false
+            };
+          } else {
+            response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
+          }
         }
       }
     } else {
