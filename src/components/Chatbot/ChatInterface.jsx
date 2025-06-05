@@ -117,6 +117,13 @@ export default function ChatInterface() {
   const [pendingState, setPendingState] = useState('');
   const [pendingExamType, setPendingExamType] = useState('JEE Main');
 
+  const resetPending = () => {
+    setPendingRank(null);
+    setPendingCategory(null);
+    setPendingState('');
+    setPendingExamType('JEE Main');
+  };
+
   useEffect(() => {
     const langTrans = uiTranslations[language] || uiTranslations.en;
     setCurrentUiText(langTrans);
@@ -238,7 +245,8 @@ export default function ChatInterface() {
     const stateForPrediction = parsed.state || pendingState;
     const examType = parsed.examType || pendingExamType || 'JEE Main';
 
-    const isPotentialCollegeQuery = parsed.isCollegeQuery || pendingRank !== null || pendingCategory !== null || pendingState;
+    const hasAllParams = rank && category && (examType !== 'JEE Main' || stateForPrediction);
+    const isPotentialCollegeQuery = parsed.isCollegeQuery || hasAllParams;
     let response;
     if (isPotentialCollegeQuery) {
       if (!rank || !category) {
@@ -291,9 +299,11 @@ export default function ChatInterface() {
         } else {
           response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
         }
+        resetPending();
       }
     } else {
       response = await findBestResponse(currentMessageText, language);
+      resetPending();
     }
     const newBotMessage = {
       type: 'bot',
