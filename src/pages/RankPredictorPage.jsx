@@ -1,7 +1,7 @@
 // src/pages/RankPredictorPage.jsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function RankPredictorPage() {
@@ -67,31 +67,29 @@ export default function RankPredictorPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!rank.trim()) { setError('Please enter your rank.'); setResults([]); setSearched(true); return; }
-    setIsLoading(true); setResults([]); setError(null); setSearched(true);
+    if (!rank.trim()) {
+      setError('Please enter your rank.');
+      setResults([]);
+      setSearched(true);
+      return;
+    }
+    setIsLoading(true);
+    setResults([]);
+    setError(null);
+    setSearched(true);
     try {
-      const userRankInt = parseInt(rank);
-      if (isNaN(userRankInt) || userRankInt <= 0) throw new Error("Invalid rank entered.");
-
-      let query = supabase.from('college_cutoffs')
-        .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, is_preparatory, id, exam_type')
-        .eq('year', 2024)
-        .eq('round_no', 6)
-        .eq('exam_type', examType)
-        .eq('seat_type', category);
-
-      if (quota) {
-          query = query.eq('quota', quota);
-      }
-
-      if (gender) query = query.eq('gender', gender);
-      query = query.eq('is_preparatory', isPreparatoryRank);
-      query = query.gte('closing_rank', userRankInt);
-      query = query.order('closing_rank', { ascending: true }).limit(100);
-
-      const { data: fetchedData, error: supabaseError } = await query;
-      if (supabaseError) throw supabaseError;
-      setResults(fetchedData || []);
+      const data = await fetchCollegePredictions(
+        {
+          rank,
+          examType,
+          category,
+          quota,
+          gender,
+          isPreparatoryRank
+        },
+        { year: 2024, round: 6 }
+      );
+      setResults(data);
     } catch (err) {
       setError(`Failed to fetch predictions: ${err.message || 'Unknown error'}`);
       setResults([]);
