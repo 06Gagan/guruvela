@@ -112,7 +112,10 @@ export default function ChatInterface() {
   const [currentCategories, setCurrentCategories] = useState([]);
   const [currentUiText, setCurrentUiText] = useState(uiTranslations.en);
   const [showPredictorPromo, setShowPredictorPromo] = useState(true);
-  const [userState, setUserState] = useState('');
+  const [pendingRank, setPendingRank] = useState(null);
+  const [pendingCategory, setPendingCategory] = useState(null);
+  const [pendingState, setPendingState] = useState('');
+  const [pendingExamType, setPendingExamType] = useState('JEE Main');
 
   useEffect(() => {
     const langTrans = uiTranslations[language] || uiTranslations.en;
@@ -224,63 +227,69 @@ export default function ChatInterface() {
     setIsLoading(true);
     const userMessageObject = { type: 'user', content: currentMessageText };
     const parsed = parseCollegeQuery(currentMessageText);
-    if (parsed.state) {
-      setUserState(parsed.state);
-    }
+
+    if (parsed.rank !== null) setPendingRank(parsed.rank);
+    if (parsed.category) setPendingCategory(parsed.category);
+    if (parsed.state) setPendingState(parsed.state);
+    if (parsed.examType) setPendingExamType(parsed.examType);
+
+    const rank = parsed.rank !== null ? parsed.rank : pendingRank;
+    const category = parsed.category || pendingCategory;
+    const stateForPrediction = parsed.state || pendingState;
+    const examType = parsed.examType || pendingExamType || 'JEE Main';
+
+    const isPotentialCollegeQuery = parsed.isCollegeQuery || pendingRank !== null || pendingCategory !== null || pendingState;
     let response;
-    if (parsed.isCollegeQuery) {
-      if (!parsed.rank || !parsed.category) {
+    if (isPotentialCollegeQuery) {
+      if (!rank || !category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
+      } else if (examType === 'JEE Main' && !stateForPrediction) {
+        response = { content: currentUiText.askState, relatedContent: null, showHowToUseSuggestion: false };
       } else {
-        const stateForPrediction = parsed.state || userState;
-        if ((parsed.examType || 'JEE Main') === 'JEE Main' && !stateForPrediction) {
-          response = { content: currentUiText.askState, relatedContent: null, showHowToUseSuggestion: false };
-        } else {
-          const hsColleges = await fetchCollegePredictions(
-            {
-              rank: parsed.rank,
-              examType: parsed.examType || 'JEE Main',
-              category: parsed.category,
-              quota: 'HS',
-              gender: 'Gender-Neutral',
-              isPreparatoryRank: false,
-              state: stateForPrediction
-            },
-            {
-              year: JOSAA_PREDICTION_YEAR,
-              round: JOSAA_PREDICTION_ROUND,
-            }
-          );
-          const osColleges = await fetchCollegePredictions(
-            {
-              rank: parsed.rank,
-              examType: parsed.examType || 'JEE Main',
-              category: parsed.category,
-              quota: 'OS',
-              gender: 'Gender-Neutral',
-              isPreparatoryRank: false,
-              state: stateForPrediction
-            },
-            {
-              year: JOSAA_PREDICTION_YEAR,
-              round: JOSAA_PREDICTION_ROUND,
-            }
-          );
-          const colleges = [...hsColleges, ...osColleges]
-            .sort((a, b) => a.closing_rank - b.closing_rank)
-            .slice(0, 10);
-          if (colleges.length > 0) {
-            const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
-            const linkHS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=HS`;
-            const linkOS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=OS`;
-            response = {
-              content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText} HS](${linkHS}) | [${currentUiText.viewFullListText} OS](${linkOS})`,
-              relatedContent: null,
-              showHowToUseSuggestion: false
-            };
-          } else {
-            response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
+        const hsColleges = await fetchCollegePredictions(
+          {
+            rank,
+            examType,
+            category,
+            quota: 'HS',
+            gender: 'Gender-Neutral',
+            isPreparatoryRank: false,
+            state: stateForPrediction
+          },
+          {
+            year: JOSAA_PREDICTION_YEAR,
+            round: JOSAA_PREDICTION_ROUND,
           }
+        );
+        const osColleges = await fetchCollegePredictions(
+          {
+            rank,
+            examType,
+            category,
+            quota: 'OS',
+            gender: 'Gender-Neutral',
+            isPreparatoryRank: false,
+            state: stateForPrediction
+          },
+          {
+            year: JOSAA_PREDICTION_YEAR,
+            round: JOSAA_PREDICTION_ROUND,
+          }
+        );
+        const colleges = [...hsColleges, ...osColleges]
+          .sort((a, b) => a.closing_rank - b.closing_rank)
+          .slice(0, 10);
+        if (colleges.length > 0) {
+          const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
+          const linkHS = `/rank-predictor?rank=${rank}&cat=${encodeURIComponent(category)}&examType=${encodeURIComponent(examType)}&state=${encodeURIComponent(stateForPrediction)}&quota=HS`;
+          const linkOS = `/rank-predictor?rank=${rank}&cat=${encodeURIComponent(category)}&examType=${encodeURIComponent(examType)}&state=${encodeURIComponent(stateForPrediction)}&quota=OS`;
+          response = {
+            content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText} HS](${linkHS}) | [${currentUiText.viewFullListText} OS](${linkOS})`,
+            relatedContent: null,
+            showHowToUseSuggestion: false
+          };
+        } else {
+          response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
         }
       }
     } else {
