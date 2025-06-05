@@ -35,12 +35,10 @@ file in the project root and provide the following variables:
 ```bash
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_JOSAA_YEAR=2024
-VITE_JOSAA_ROUND=6
-VITE_CSAB_YEAR=2024
-VITE_CSAB_ROUND=2
 ```
 
 Replace the placeholders with the values from your Supabase project. Without
-these values the chatbot will respond with a fallback message because it cannot
-fetch prediction data.
+these credentials the chatbot will respond with a fallback message because it
+cannot fetch prediction data. The JoSAA/CSAB prediction year and round values
+are now hard-coded in `src/config/constants.js` and do not need to be supplied
+via environment variables.
