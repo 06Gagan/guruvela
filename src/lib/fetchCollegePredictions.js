@@ -43,5 +43,6 @@ export async function fetchCollegePredictions({
     throw error;
   }
 
-  return data || [];
+  const filtered = (data || []).filter(item => !/architecture/i.test(item.branch_name));
+  return filtered;
 }
