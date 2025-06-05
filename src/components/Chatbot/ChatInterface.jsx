@@ -179,7 +179,8 @@ export default function ChatInterface() {
         relatedContent: responseData.related_content_slug,
         showHowToUseSuggestion: false
       };
-    } catch (catchError) {
+    } catch (error) {
+      console.error(error);
       return {
         content: langTrans.connectionError,
         relatedContent: null,
