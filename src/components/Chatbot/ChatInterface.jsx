@@ -236,21 +236,6 @@ export default function ChatInterface() {
         if ((parsed.examType || 'JEE Main') === 'JEE Main' && !stateForPrediction) {
           response = { content: currentUiText.askState, relatedContent: null, showHowToUseSuggestion: false };
         } else {
-          const hsColleges = await fetchCollegePredictions(
-            {
-              rank: parsed.rank,
-              examType: parsed.examType || 'JEE Main',
-              category: parsed.category,
-              quota: 'HS',
-              gender: 'Gender-Neutral',
-              isPreparatoryRank: false,
-              state: stateForPrediction
-            },
-            {
-              year: JOSAA_PREDICTION_YEAR,
-              round: JOSAA_PREDICTION_ROUND,
-            }
-          );
           const osColleges = await fetchCollegePredictions(
             {
               rank: parsed.rank,
@@ -266,7 +251,7 @@ export default function ChatInterface() {
               round: JOSAA_PREDICTION_ROUND,
             }
           );
-          const colleges = [...hsColleges, ...osColleges]
+          const colleges = osColleges
             .sort((a, b) => a.closing_rank - b.closing_rank)
             .slice(0, 10);
           if (colleges.length > 0) {
