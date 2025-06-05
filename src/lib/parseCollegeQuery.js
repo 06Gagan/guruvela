@@ -74,6 +74,15 @@ export const stateKeywords = {
   lakshadweep: 'Lakshadweep'
 };
 
+export const cityKeywords = {
+  warangal: 'Telangana',
+  trichy: 'Tamil Nadu',
+  kurukshetra: 'Haryana',
+  jaipur: 'Rajasthan',
+  surat: 'Gujarat',
+  gandhinagar: 'Gujarat'
+};
+
 export function parseCollegeQuery(text) {
   const lower = text.toLowerCase();
   let match =
@@ -98,6 +107,12 @@ export function parseCollegeQuery(text) {
   for (const [key, value] of Object.entries(stateKeywords)) {
     const regex = new RegExp(`\\b${key}\\b`, 'i');
     if (regex.test(lower)) { state = value; break; }
+  }
+  if (!state) {
+    for (const [key, value] of Object.entries(cityKeywords)) {
+      const regex = new RegExp(`\\b${key}\\b`, 'i');
+      if (regex.test(lower)) { state = value; break; }
+    }
   }
 
   let examType = null;
