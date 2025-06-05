@@ -245,54 +245,36 @@ export default function ChatInterface() {
     const stateForPrediction = parsed.state || pendingState;
     const examType = parsed.examType || pendingExamType || 'JEE Main';
 
-    const hasAllParams = rank && category && (examType !== 'JEE Main' || stateForPrediction);
+    const quotaForExam = examType === 'JEE Advanced' ? 'AI' : 'OS';
+    const hasAllParams = rank && category;
     const isPotentialCollegeQuery = parsed.isCollegeQuery || hasAllParams;
     let response;
     if (isPotentialCollegeQuery) {
       if (!rank || !category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
-      } else if (examType === 'JEE Main' && !stateForPrediction) {
-        response = { content: currentUiText.askState, relatedContent: null, showHowToUseSuggestion: false };
       } else {
-        const hsColleges = await fetchCollegePredictions(
+        const colleges = await fetchCollegePredictions(
           {
             rank,
             examType,
             category,
-            quota: 'HS',
+            quota: quotaForExam,
             gender: 'Gender-Neutral',
-            isPreparatoryRank: false,
-            state: stateForPrediction
+            isPreparatoryRank: false
           },
           {
             year: JOSAA_PREDICTION_YEAR,
             round: JOSAA_PREDICTION_ROUND,
           }
         );
-        const osColleges = await fetchCollegePredictions(
-          {
-            rank,
-            examType,
-            category,
-            quota: 'OS',
-            gender: 'Gender-Neutral',
-            isPreparatoryRank: false,
-            state: stateForPrediction
-          },
-          {
-            year: JOSAA_PREDICTION_YEAR,
-            round: JOSAA_PREDICTION_ROUND,
-          }
-        );
-        const colleges = [...hsColleges, ...osColleges]
+        const sorted = colleges
           .sort((a, b) => a.closing_rank - b.closing_rank)
           .slice(0, 10);
-        if (colleges.length > 0) {
-          const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
-          const linkHS = `/rank-predictor?rank=${rank}&cat=${encodeURIComponent(category)}&examType=${encodeURIComponent(examType)}&state=${encodeURIComponent(stateForPrediction)}&quota=HS`;
-          const linkOS = `/rank-predictor?rank=${rank}&cat=${encodeURIComponent(category)}&examType=${encodeURIComponent(examType)}&state=${encodeURIComponent(stateForPrediction)}&quota=OS`;
+        if (sorted.length > 0) {
+          const lines = sorted.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
+          const link = `/rank-predictor?rank=${rank}&cat=${encodeURIComponent(category)}&examType=${encodeURIComponent(examType)}&quota=${quotaForExam}`;
           response = {
-            content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText} HS](${linkHS}) | [${currentUiText.viewFullListText} OS](${linkOS})`,
+            content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
             relatedContent: null,
             showHowToUseSuggestion: false
           };
