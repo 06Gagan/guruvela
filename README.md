@@ -35,10 +35,6 @@ file in the project root and provide the following variables:
 ```bash
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_JOSAA_YEAR=2024
-VITE_JOSAA_ROUND=6
-VITE_CSAB_YEAR=2024
-VITE_CSAB_ROUND=2
 ```
 
 Replace the placeholders with the values from your Supabase project. Without
