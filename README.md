@@ -26,3 +26,10 @@ the following category keywords are understood (case-insensitive):
 - **SC (PwD)**: `sc pwd`, `sc-pwd`
 - **ST**: `st`
 - **ST (PwD)**: `st pwd`, `st-pwd`
+
+## Exam Type Keywords
+
+When specifying the exam type in chatbot queries, the following keywords are understood:
+
+- **JEE Main**: `jee main`, `jee mains`, `main exam`
+- **JEE Advanced**: `jee advanced`, `jee advance`, `advanced`
