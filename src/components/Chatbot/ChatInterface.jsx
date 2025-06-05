@@ -265,7 +265,6 @@ export default function ChatInterface() {
             <div
               key={index}
               className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              role={msg.type === 'user' ? 'user-message' : 'bot-message'}
             >
               <div
                 className={`max-w-[80%] rounded-lg p-4 shadow-sm transition-all duration-200
