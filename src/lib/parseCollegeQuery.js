@@ -51,6 +51,13 @@ export function parseCollegeQuery(text) {
   const branch = branchMatch ? branchMatch[0] : null;
   const instituteMatch = text.match(/(?:at|in|for)\s+([A-Za-z ]*(?:IIT|NIT|IIIT)[A-Za-z ]*)/i);
   const institute = instituteMatch ? instituteMatch[1].trim() : null;
+
+  let examType = null;
+  if (/\bjee\s*advanced\b/.test(lower) || /\bjee[-\s]?adv\b/.test(lower)) {
+    examType = 'JEE Advanced';
+  } else if (/\bjee\s*mains?\b/.test(lower) || /\bjee[-\s]?main\b/.test(lower)) {
+    examType = 'JEE Main';
+  }
   const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
-  return { rank, category, branch, institute, isCollegeQuery };
+  return { rank, category, branch, institute, examType, isCollegeQuery };
 }

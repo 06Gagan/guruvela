@@ -241,13 +241,23 @@ export default function ChatInterface() {
       if (!parsed.rank || !parsed.category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
       } else {
-        const colleges = await fetchCollegePredictions(parsed, {
-          year: JOSAA_PREDICTION_YEAR,
-          round: JOSAA_PREDICTION_ROUND,
-        });
+        const colleges = await fetchCollegePredictions(
+          {
+            rank: parsed.rank,
+            examType: parsed.examType || 'JEE Main',
+            category: parsed.category,
+            quota: '',
+            gender: 'Gender-Neutral',
+            isPreparatoryRank: false,
+          },
+          {
+            year: JOSAA_PREDICTION_YEAR,
+            round: JOSAA_PREDICTION_ROUND,
+          }
+        );
         if (colleges.length > 0) {
           const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
-          const link = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
+          const link = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}`;
           response = {
             content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
             relatedContent: null,

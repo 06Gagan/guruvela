@@ -1,6 +1,6 @@
 // src/pages/RankPredictorPage.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
 import {
   JOSAA_PREDICTION_YEAR,
@@ -21,7 +21,11 @@ export default function RankPredictorPage() {
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
 
+  const [autoSearch, setAutoSearch] = useState(false);
+
   const { language } = useLanguage();
+
+  const [searchParams] = useSearchParams();
 
   // Corrected link
   const preparatoryGuideLink = "/pages/iit-prep-course-guide";
@@ -48,6 +52,23 @@ export default function RankPredictorPage() {
     }
   };
   const uiText = pageTranslations[language] || pageTranslations.en;
+
+  useEffect(() => {
+    const rankParam = searchParams.get('rank');
+    const catParam = searchParams.get('cat');
+    const examParam = searchParams.get('examType');
+    if (rankParam) setRank(rankParam);
+    if (catParam) setCategory(catParam);
+    if (examParam) setExamType(examParam);
+    if (rankParam && catParam && examParam) setAutoSearch(true);
+  }, []); // run once on mount
+
+  useEffect(() => {
+    if (autoSearch && rank && category && examType) {
+      handleSubmit();
+      setAutoSearch(false);
+    }
+  }, [autoSearch, rank, category, examType]);
 
   useEffect(() => {
     if (examType === 'JEE Advanced') {
