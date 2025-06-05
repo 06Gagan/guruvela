@@ -11,6 +11,44 @@ const initialCategoriesBase = [
   { id: 'cat_colorblind', topicId: 'josaa_colorblind_general', labelKey: 'colorblindLabel', queryKey: 'colorblindQuery' },
 ];
 
+const categoryMap = {
+  open: 'OPEN',
+  general: 'OPEN',
+  ews: 'EWS',
+  obc: 'OBC-NCL',
+  'obc-ncl': 'OBC-NCL',
+  sc: 'SC',
+  st: 'ST',
+  pwd: '(PwD)' // placeholder for partial match to handle PwD categories
+};
+
+/**
+ * Parse a natural language query to determine the seat type category.
+ * Uses word boundary regular expressions for reliable matching.
+ * @param {string} query
+ * @returns {string|null} mapped seat type or null when no match found
+ */
+function parseCollegeQuery(query) {
+  if (!query) return null;
+  const lowerQuery = query.toLowerCase();
+  for (const [key, value] of Object.entries(categoryMap)) {
+    const regex = new RegExp(`\\b${key}\\b`, 'i');
+    if (regex.test(lowerQuery)) {
+      if (value === '(PwD)') {
+        // Match the preceding category and append PwD
+        // Example: 'obc pwd' should map to 'OBC-NCL (PwD)'
+        const base = Object.entries(categoryMap).find(([k]) =>
+          lowerQuery.match(new RegExp(`\\b${k}\\b`, 'i')) && k !== 'pwd'
+        );
+        if (base) return `${base[1]} (PwD)`;
+        return 'OPEN (PwD)';
+      }
+      return value;
+    }
+  }
+  return null;
+}
+
 const uiTranslations = {
   en: {
     greeting: "Hi! I'm Guruvela's assistant. How can I help you with JoSAA/CSAB counseling today?",
