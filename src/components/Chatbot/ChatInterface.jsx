@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { JOSAA_LATEST } from '../../predictorConfig.js';
 
 const initialCategoriesBase = [
   { id: 'cat_josaa_docs', topicId: 'josaa_documents_general', labelKey: 'documentsLabel', queryKey: 'documentsQuery' },
@@ -73,6 +74,51 @@ const uiTranslations = {
     goToPredictorButton: "JoSAA College Predictor"
   }
 };
+
+export async function fetchCollegePredictions({
+  rank,
+  examType = 'JEE Main',
+  category = 'OPEN',
+  quota = '',
+  gender = 'Gender-Neutral',
+  isPreparatoryRank = false,
+  year,
+  round,
+}) {
+  const finalYear = year || JOSAA_LATEST.year || new Date().getFullYear();
+  const finalRound = round || JOSAA_LATEST.round || 1;
+  const userRankInt = parseInt(rank);
+  if (isNaN(userRankInt) || userRankInt <= 0) {
+    throw new Error('Invalid rank');
+  }
+
+  let query = supabase
+    .from('college_cutoffs')
+    .select(
+      'institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, is_preparatory, id, exam_type'
+    )
+    .eq('year', finalYear)
+    .eq('round_no', finalRound)
+    .eq('exam_type', examType)
+    .eq('seat_type', category);
+
+  if (quota) {
+    query = query.eq('quota', quota);
+  }
+  if (gender) {
+    query = query.eq('gender', gender);
+  }
+
+  query = query.eq('is_preparatory', isPreparatoryRank);
+  query = query.gte('closing_rank', userRankInt);
+  query = query.order('closing_rank', { ascending: true }).limit(100);
+
+  const { data, error } = await query;
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
 
 export default function ChatInterface() {
   const [message, setMessage] = useState('');
