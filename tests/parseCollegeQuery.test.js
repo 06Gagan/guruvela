@@ -37,5 +37,23 @@ assert.equal(result.state, 'Maharashtra');
 result = parseCollegeQuery('my state is karnataka');
 assert.equal(result.state, 'Karnataka');
 
+result = parseCollegeQuery('colleges near warangal');
+assert.equal(result.state, 'Telangana');
+
+result = parseCollegeQuery('colleges in trichy');
+assert.equal(result.state, 'Tamil Nadu');
+
+result = parseCollegeQuery('engineering in kurukshetra');
+assert.equal(result.state, 'Haryana');
+
+result = parseCollegeQuery('admission at jaipur');
+assert.equal(result.state, 'Rajasthan');
+
+result = parseCollegeQuery('iit surat campus');
+assert.equal(result.state, 'Gujarat');
+
+result = parseCollegeQuery('rank 1000 gandhinagar institutes');
+assert.equal(result.state, 'Gujarat');
+
 console.log('All tests passed');
 
