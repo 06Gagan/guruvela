@@ -1,5 +1,5 @@
 // src/pages/CsabRankPredictorPage.jsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import { supabase } from '../lib/supabase';
 
