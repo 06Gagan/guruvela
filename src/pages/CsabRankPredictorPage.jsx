@@ -2,6 +2,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import { supabase } from '../lib/supabase';
+import {
+  CSAB_PREDICTION_YEAR,
+  CSAB_PREDICTION_ROUND,
+} from '../config/constants';
 
 export default function CsabRankPredictorPage() {
   const [rank, setRank] = useState('');
@@ -52,8 +56,8 @@ export default function CsabRankPredictorPage() {
       let query = supabase
         .from('csab_college_cutoffs')
         .select('institute_name, branch_name, quota, seat_type, gender, opening_rank, closing_rank, year, round_no, id')
-        .eq('year', 2024) 
-        .eq('round_no', 2) 
+        .eq('year', CSAB_PREDICTION_YEAR)
+        .eq('round_no', CSAB_PREDICTION_ROUND)
         .eq('seat_type', category);
 
       if (quota) {
@@ -93,7 +97,7 @@ export default function CsabRankPredictorPage() {
         Guruvela - CSAB College Predictor
       </h1>
       <p className="text-center text-gray-600 mb-6">
-        Find potential colleges based on CSAB Special Round 2 (2024) cutoffs (JEE Main Ranks).
+        Find potential colleges based on CSAB Special Round {CSAB_PREDICTION_ROUND} ({CSAB_PREDICTION_YEAR}) cutoffs (JEE Main Ranks).
       </p>
 
       {/* Updated to use the .card class from index.css */}
@@ -185,7 +189,7 @@ export default function CsabRankPredictorPage() {
       {error && <p className="text-center text-red-600 mb-4 p-4 bg-red-100 rounded-md">Error: {error}</p>}
       
       {searched && !isLoading && results.length === 0 && !error && (
-        <p className="text-center text-gray-700 my-8 p-4 bg-yellow-100 rounded-md">No colleges found matching your criteria for CSAB Special Round 2 (2024) based on available data. Your rank might be higher than the cutoffs for these filters, or no data exists for this specific combination.</p>
+        <p className="text-center text-gray-700 my-8 p-4 bg-yellow-100 rounded-md">No colleges found matching your criteria for CSAB Special Round {CSAB_PREDICTION_ROUND} ({CSAB_PREDICTION_YEAR}) based on available data. Your rank might be higher than the cutoffs for these filters, or no data exists for this specific combination.</p>
       )}
 
       {!isLoading && results.length > 0 && (

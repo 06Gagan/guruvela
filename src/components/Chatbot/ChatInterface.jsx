@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import { supabase } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { parseCollegeQuery } from '../../lib/parseCollegeQuery';
+import { JOSAA_PREDICTION_YEAR, JOSAA_PREDICTION_ROUND } from '../../config/constants';
 
 const initialCategoriesBase = [
   { id: 'cat_josaa_docs', topicId: 'josaa_documents_general', labelKey: 'documentsLabel', queryKey: 'documentsQuery' },
@@ -15,13 +16,16 @@ const initialCategoriesBase = [
 ];
 
 
-async function fetchCollegePredictions({ rank, category, branch, institute }) {
+async function fetchCollegePredictions(
+  { rank, category, branch, institute },
+  { year = JOSAA_PREDICTION_YEAR, round = JOSAA_PREDICTION_ROUND } = {}
+) {
   try {
     let query = supabase
       .from('college_cutoffs')
       .select('institute_name, branch_name, closing_rank')
-      .eq('year', 2024)
-      .eq('round_no', 6)
+      .eq('year', year)
+      .eq('round_no', round)
       .eq('exam_type', 'JEE Main')
       .eq('seat_type', category)
       .gte('closing_rank', rank);
@@ -237,7 +241,10 @@ export default function ChatInterface() {
       if (!parsed.rank || !parsed.category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
       } else {
-        const colleges = await fetchCollegePredictions(parsed);
+        const colleges = await fetchCollegePredictions(parsed, {
+          year: JOSAA_PREDICTION_YEAR,
+          round: JOSAA_PREDICTION_ROUND,
+        });
         if (colleges.length > 0) {
           const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
           const link = `https://guruvela.in/college-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
