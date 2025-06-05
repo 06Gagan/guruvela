@@ -247,7 +247,7 @@ export default function ChatInterface() {
         });
         if (colleges.length > 0) {
           const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
-          const link = `https://guruvela.in/college-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
+          const link = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
           response = {
             content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
             relatedContent: null,
