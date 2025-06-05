@@ -31,6 +31,9 @@ assert.equal(result.examType, 'JEE Advanced');
 result = parseCollegeQuery('rank 99 in JeeAdvance');
 assert.equal(result.examType, 'JEE Advanced');
 
+result = parseCollegeQuery('rank 500 in jee advance');
+assert.equal(result.examType, 'JEE Advanced');
+
 result = parseCollegeQuery("I'm from Maharashtra with rank 1500");
 assert.equal(result.state, 'Maharashtra');
 

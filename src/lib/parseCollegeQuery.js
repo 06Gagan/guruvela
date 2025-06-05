@@ -116,7 +116,7 @@ export function parseCollegeQuery(text) {
   }
 
   let examType = null;
-  if (/\bjee\s*advanced\b/.test(lower) || /\bjee[-\s]?adv\b/.test(lower) || /\bjeeadv(?:ance|anced)?\b/.test(lower)) {
+  if (/\bjee\s*advanced\b/.test(lower) || /\bjee\s*advance\b/.test(lower) || /\bjee[-\s]?adv\b/.test(lower) || /\bjeeadv(?:ance|anced)?\b/.test(lower)) {
     examType = 'JEE Advanced';
   } else if (/\bjee\s*mains?\b/.test(lower) || /\bjee[-\s]?main\b/.test(lower)) {
     examType = 'JEE Main';
