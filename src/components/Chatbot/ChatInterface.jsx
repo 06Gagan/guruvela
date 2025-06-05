@@ -47,7 +47,7 @@ const uiTranslations = {
     predictorPopupText: "Curious about your college options? Try our JoSAA College Predictor!",
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Here are the top 3 colleges you might get based on your rank and category:",
-    viewFullListText: "View Full List on Guruvela",
+    viewFullListText: "View Full OS List on Guruvela",
     clarifyMissingInfo: "Can you tell me your JEE rank and category (General, OBC, SC, etc.)?",
     askState: "Which state are you from?"
   },
@@ -71,7 +71,7 @@ const uiTranslations = {
     predictorPopupText: "Apne college options ke baare mein जानना chahte hain? Hamara JoSAA College Predictor try karein!",
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Yeh hain top 3 colleges jo aapke rank aur category ke hisaab se mil sakte hain:",
-    viewFullListText: "Puri list Guruvela par dekhein",
+    viewFullListText: "Puri OS list Guruvela par dekhein",
     clarifyMissingInfo: "Kya aap apna JEE rank aur category bata sakte hain (General, OBC, SC, etc.)?",
     askState: "Aap kis rajya se hain?"
   },
@@ -95,7 +95,7 @@ const uiTranslations = {
     predictorPopupText: "Mee college optionla gurinchi telusukovalani unda? Maa JoSAA College Predictor prayatninchandi!",
     goToPredictorButton: "JoSAA College Predictor",
     collegeSuggestionPrefix: "Mee rank mariyu category ni base cheskoni meeku dorakachu anukune top 3 colleges:",
-    viewFullListText: "Full list Guruvela lo chudandi",
+    viewFullListText: "OS list Guruvela lo chudandi",
     clarifyMissingInfo: "Mee JEE rank mariyu category (General, OBC, SC, etc.) cheppagalara?",
     askState: "Mee home state enti?"
   }
@@ -271,10 +271,9 @@ export default function ChatInterface() {
             .slice(0, 10);
           if (colleges.length > 0) {
             const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name} (${c.quota})`).join('\n');
-            const linkHS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=HS`;
             const linkOS = `/rank-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}&examType=${encodeURIComponent(parsed.examType || 'JEE Main')}&state=${encodeURIComponent(stateForPrediction)}&quota=OS`;
             response = {
-              content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText} HS](${linkHS}) | [${currentUiText.viewFullListText} OS](${linkOS})`,
+              content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${linkOS})`,
               relatedContent: null,
               showHowToUseSuggestion: false
             };
