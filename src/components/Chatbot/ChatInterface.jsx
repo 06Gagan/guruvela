@@ -11,6 +11,56 @@ const initialCategoriesBase = [
   { id: 'cat_colorblind', topicId: 'josaa_colorblind_general', labelKey: 'colorblindLabel', queryKey: 'colorblindQuery' },
 ];
 
+const categoryMap = {
+  obc: 'OBC-NCL',
+  'obc ncl': 'OBC-NCL',
+  sc: 'SC',
+  st: 'ST',
+  ews: 'EWS',
+  gen: 'OPEN',
+  general: 'OPEN',
+  open: 'OPEN'
+};
+
+function parseCollegeQuery(text) {
+  const lower = text.toLowerCase();
+  const rankMatch = lower.match(/\b(\d{3,})\b/);
+  const rank = rankMatch ? parseInt(rankMatch[1], 10) : null;
+  let category = null;
+  for (const key of Object.keys(categoryMap)) {
+    if (lower.includes(key)) { category = categoryMap[key]; break; }
+  }
+  const branchMatch = text.match(/\b(CSE|Computer Science|ECE|Electrical|Electronics|Mechanical|Civil|IT|Information Technology)\b/i);
+  const branch = branchMatch ? branchMatch[0] : null;
+  const instituteMatch = text.match(/(?:at|in|for)\s+([A-Za-z ]*(?:IIT|NIT|IIIT)[A-Za-z ]*)/i);
+  const institute = instituteMatch ? instituteMatch[1].trim() : null;
+  const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
+  return { rank, category, branch, institute, isCollegeQuery };
+}
+
+async function fetchCollegePredictions({ rank, category, branch, institute }) {
+  try {
+    let query = supabase
+      .from('college_cutoffs')
+      .select('institute_name, branch_name, closing_rank')
+      .eq('year', 2024)
+      .eq('round_no', 6)
+      .eq('exam_type', 'JEE Main')
+      .eq('seat_type', category)
+      .gte('closing_rank', rank);
+
+    if (branch) query = query.ilike('branch_name', `%${branch}%`);
+    if (institute) query = query.ilike('institute_name', `%${institute}%`);
+
+    const { data, error } = await query.order('closing_rank', { ascending: true }).limit(3);
+    if (error) { console.error('Supabase error', error); return []; }
+    return data || [];
+  } catch (err) {
+    console.error('Prediction fetch error', err);
+    return [];
+  }
+}
+
 const uiTranslations = {
   en: {
     greeting: "Hi! I'm Guruvela's assistant. How can I help you with JoSAA/CSAB counseling today?",
@@ -30,7 +80,10 @@ const uiTranslations = {
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: ".",
     predictorPopupText: "Curious about your college options? Try our JoSAA College Predictor!",
-    goToPredictorButton: "JoSAA College Predictor"
+    goToPredictorButton: "JoSAA College Predictor",
+    collegeSuggestionPrefix: "Here are the top 3 colleges you might get based on your rank and category:",
+    viewFullListText: "View Full List on Guruvela",
+    clarifyMissingInfo: "Can you tell me your JEE rank and category (General, OBC, SC, etc.)?"
   },
   'hi-en': {
     greeting: "Namaste! Main Guruvela ka assistant hoon. JoSAA/CSAB counselling mein aapki kya help kar sakta hoon?",
@@ -50,7 +103,10 @@ const uiTranslations = {
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: " dekhein.",
     predictorPopupText: "Apne college options ke baare mein जानना chahte hain? Hamara JoSAA College Predictor try karein!",
-    goToPredictorButton: "JoSAA College Predictor"
+    goToPredictorButton: "JoSAA College Predictor",
+    collegeSuggestionPrefix: "Yeh hain top 3 colleges jo aapke rank aur category ke hisaab se mil sakte hain:",
+    viewFullListText: "Puri list Guruvela par dekhein",
+    clarifyMissingInfo: "Kya aap apna JEE rank aur category bata sakte hain (General, OBC, SC, etc.)?"
   },
   'te-en': {
     greeting: "Namaste! Nenu Guruvela assistant. JoSAA/CSAB counselling lo ela help cheyagalanu?",
@@ -70,7 +126,10 @@ const uiTranslations = {
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: " chudandi.",
     predictorPopupText: "Mee college optionla gurinchi telusukovalani unda? Maa JoSAA College Predictor prayatninchandi!",
-    goToPredictorButton: "JoSAA College Predictor"
+    goToPredictorButton: "JoSAA College Predictor",
+    collegeSuggestionPrefix: "Mee rank mariyu category ni base cheskoni meeku dorakachu anukune top 3 colleges:",
+    viewFullListText: "Full list Guruvela lo chudandi",
+    clarifyMissingInfo: "Mee JEE rank mariyu category (General, OBC, SC, etc.) cheppagalara?"
   }
 };
 
@@ -194,7 +253,28 @@ export default function ChatInterface() {
     if (!currentMessageText.trim() || isLoading) return;
     setIsLoading(true);
     const userMessageObject = { type: 'user', content: currentMessageText };
-    const response = await findBestResponse(currentMessageText, language);
+    const parsed = parseCollegeQuery(currentMessageText);
+    let response;
+    if (parsed.isCollegeQuery) {
+      if (!parsed.rank || !parsed.category) {
+        response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
+      } else {
+        const colleges = await fetchCollegePredictions(parsed);
+        if (colleges.length > 0) {
+          const lines = colleges.map(c => `\ud83c\udf93 ${c.institute_name} \u2013 ${c.branch_name}`).join('\n');
+          const link = `https://guruvela.in/college-predictor?rank=${parsed.rank}&cat=${encodeURIComponent(parsed.category)}`;
+          response = {
+            content: `${currentUiText.collegeSuggestionPrefix}\n${lines}\n[${currentUiText.viewFullListText}](${link})`,
+            relatedContent: null,
+            showHowToUseSuggestion: false
+          };
+        } else {
+          response = { content: currentUiText.fallbackResponse, relatedContent: 'josaa-comprehensive-faq', showHowToUseSuggestion: true };
+        }
+      }
+    } else {
+      response = await findBestResponse(currentMessageText, language);
+    }
     const newBotMessage = {
       type: 'bot',
       content: response.content,
