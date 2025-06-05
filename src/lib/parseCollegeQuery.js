@@ -1,6 +1,29 @@
 export const categoryMap = {
-  obc: 'OBC-NCL',
+  // PwD variations first so they match before the non-PwD keywords
+  'gen pwd': 'OPEN (PwD)',
+  'gen-pwd': 'OPEN (PwD)',
+  'general pwd': 'OPEN (PwD)',
+  'general-pwd': 'OPEN (PwD)',
+  'open pwd': 'OPEN (PwD)',
+  'open-pwd': 'OPEN (PwD)',
+
+  'ews pwd': 'EWS (PwD)',
+  'ews-pwd': 'EWS (PwD)',
+
+  'obc ncl pwd': 'OBC-NCL (PwD)',
+  'obc-ncl pwd': 'OBC-NCL (PwD)',
+  'obc-ncl-pwd': 'OBC-NCL (PwD)',
+
+  'sc pwd': 'SC (PwD)',
+  'sc-pwd': 'SC (PwD)',
+
+  'st pwd': 'ST (PwD)',
+  'st-pwd': 'ST (PwD)',
+
+  // Standard non-PwD keywords
   'obc ncl': 'OBC-NCL',
+  'obc-ncl': 'OBC-NCL',
+  obc: 'OBC-NCL',
   sc: 'SC',
   st: 'ST',
   ews: 'EWS',
@@ -21,8 +44,8 @@ export function parseCollegeQuery(text) {
   const rank = rankStr ? parseInt(rankStr, 10) : null;
 
   let category = null;
-  for (const key of Object.keys(categoryMap)) {
-    if (lower.includes(key)) { category = categoryMap[key]; break; }
+  for (const [key, value] of Object.entries(categoryMap)) {
+    if (lower.includes(key.toLowerCase())) { category = value; break; }
   }
   const branchMatch = text.match(/\b(CSE|Computer Science|ECE|Electrical|Electronics|Mechanical|Civil|IT|Information Technology)\b/i);
   const branch = branchMatch ? branchMatch[0] : null;

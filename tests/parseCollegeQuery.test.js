@@ -15,5 +15,14 @@ assert.equal(result.rank, 4231);
 result = parseCollegeQuery('I want 3 colleges');
 assert.equal(result.rank, null);
 
+result = parseCollegeQuery('rank 123 obc-ncl pwd');
+assert.equal(result.category, 'OBC-NCL (PwD)');
+
+result = parseCollegeQuery('rank 99 gen pwd');
+assert.equal(result.category, 'OPEN (PwD)');
+
+result = parseCollegeQuery('rank 100 ews-pwd');
+assert.equal(result.category, 'EWS (PwD)');
+
 console.log('All tests passed');
 
