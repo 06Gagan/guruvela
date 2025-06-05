@@ -33,7 +33,8 @@ export default function RankPredictorPage() {
 
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
   const quotaOptions = {
-    'JEE Main': ["AI", "HS", "OS", "GO"],
+    // Default to OS for JEE Main as it is the most common scenario
+    'JEE Main': ["OS", "HS", "AI", "GO"],
     'JEE Advanced': ["AI"]
   };
   const genderOptions = ["Gender-Neutral", "Female-only (including Supernumerary)"];
@@ -81,14 +82,14 @@ export default function RankPredictorPage() {
     } else if (examType === 'JEE Main') {
       const mainExamQuotas = quotaOptions['JEE Main'];
       if (!mainExamQuotas.includes(quota)) {
-        setQuota(mainExamQuotas[0] || '');
+        setQuota(mainExamQuotas[0] || 'OS');
       }
     }
   }, [examType, quota]);
 
   useEffect(() => {
     if (examType === 'JEE Main') {
-      setQuota(quotaOptions['JEE Main'][0] || 'AI');
+      setQuota(quotaOptions['JEE Main'][0] || 'OS');
     } else if (examType === 'JEE Advanced') {
       setQuota('AI');
     }
