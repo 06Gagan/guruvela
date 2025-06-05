@@ -2,6 +2,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
+import {
+  JOSAA_PREDICTION_YEAR,
+  JOSAA_PREDICTION_ROUND,
+} from '../config/constants';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function RankPredictorPage() {
@@ -85,9 +89,9 @@ export default function RankPredictorPage() {
           category,
           quota,
           gender,
-          isPreparatoryRank
+          isPreparatoryRank,
         },
-        { year: 2024, round: 6 }
+        { year: JOSAA_PREDICTION_YEAR, round: JOSAA_PREDICTION_ROUND }
       );
       setResults(data);
     } catch (err) {
@@ -295,7 +299,7 @@ export default function RankPredictorPage() {
             <h2 className="text-xl font-semibold text-gray-800">
               Potential Colleges
               <span className="text-sm font-normal text-gray-500 ml-2">
-                (JoSAA Round 6, 2024)
+                (JoSAA Round {JOSAA_PREDICTION_ROUND}, {JOSAA_PREDICTION_YEAR})
               </span>
             </h2>
           </div>
