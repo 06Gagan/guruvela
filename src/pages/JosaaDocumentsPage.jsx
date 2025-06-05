@@ -58,7 +58,8 @@ export default function JosaaDocumentsPage() {
 
         if (supabaseError) throw supabaseError;
         setDocuments(data || []);
-      } catch (err) {
+      } catch (error) {
+        console.error('Error fetching documents:', error);
         setError(uiText.errorLoading);
       } finally {
         setLoading(false);

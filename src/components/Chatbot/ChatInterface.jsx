@@ -70,9 +70,45 @@ const uiTranslations = {
     howToUseReferralLinkText: "How to Use Guide",
     howToUseReferralSuffix: " chudandi.",
     predictorPopupText: "Mee college optionla gurinchi telusukovalani unda? Maa JoSAA College Predictor prayatninchandi!",
-    goToPredictorButton: "JoSAA College Predictor"
+  goToPredictorButton: "JoSAA College Predictor"
   }
 };
+
+export function parseCollegeQuery(query) {
+  const lower = query.toLowerCase();
+  const result = { category: null, rank: null };
+
+  const rankMatch = lower.match(/\b(\d{1,7})\b/);
+  if (rankMatch) result.rank = parseInt(rankMatch[1], 10);
+
+  const hasPwd = /\bpwd\b/.test(lower);
+  const mapping = {
+    open: 'OPEN',
+    general: 'OPEN',
+    gen: 'OPEN',
+    ur: 'OPEN',
+    unreserved: 'OPEN',
+    ews: 'EWS',
+    obc: 'OBC-NCL',
+    'obc-ncl': 'OBC-NCL',
+    sc: 'SC',
+    st: 'ST'
+  };
+
+  for (const [pattern, value] of Object.entries(mapping)) {
+    const regex = new RegExp(`\\b${pattern}\\b`, 'i');
+    if (regex.test(lower)) {
+      result.category = value;
+      break;
+    }
+  }
+
+  if (result.category && hasPwd) {
+    result.category += ' (PwD)';
+  }
+
+  return result;
+}
 
 export default function ChatInterface() {
   const [message, setMessage] = useState('');
@@ -179,7 +215,8 @@ export default function ChatInterface() {
         relatedContent: responseData.related_content_slug,
         showHowToUseSuggestion: false
       };
-    } catch (catchError) {
+    } catch (error) {
+      console.error('Error fetching response:', error);
       return {
         content: langTrans.connectionError,
         relatedContent: null,
