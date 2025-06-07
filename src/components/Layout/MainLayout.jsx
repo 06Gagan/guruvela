@@ -11,7 +11,7 @@ export default function MainLayout() {
   const isChatbotPage = location.pathname === '/';
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-[100dvh] flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
         <Outlet /> {/* Child route components (like ChatInterface) render here */}
