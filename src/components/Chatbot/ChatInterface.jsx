@@ -436,20 +436,20 @@ export default function ChatInterface() {
 
         <div className="border-t border-gray-200 p-4 bg-white">
           {/* Form area, fixed height */}
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={currentUiText.askPlaceholder}
-              className="flex-grow form-input"
+              className="flex-grow form-input w-full"
               disabled={isLoading}
               aria-label="Type your message"
             />
             <button
               type="submit"
               disabled={!message.trim() || isLoading}
-              className={`btn-primary flex items-center gap-2 min-w-[100px] justify-center
+              className={`btn-primary flex items-center gap-2 justify-center w-full sm:w-auto sm:min-w-[100px]
                 ${(!message.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
               aria-label={isLoading ? "Sending message..." : "Send message"}
             >
