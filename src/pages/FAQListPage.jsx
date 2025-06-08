@@ -4,14 +4,19 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../contexts/LanguageContext';
 
+// Labels for displaying language names
+const languageLabels = {
+  en: 'English',
+  'hi-en': 'Hinglish',
+  'te-en': 'Teluguish'
+};
+
 export default function FAQListPage() {
   const { language } = useLanguage();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const languageLabels = { 'en': 'English', 'hi-en': 'Hinglish', 'te-en': 'Teluguish' };
-
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
