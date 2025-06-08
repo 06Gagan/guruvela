@@ -55,38 +55,6 @@ export default function RankPredictorPage() {
   };
   const uiText = pageTranslations[language] || pageTranslations.en;
 
-  useEffect(() => {
-    const rankParam = searchParams.get('rank');
-    const catParam = searchParams.get('cat');
-    const examParam = searchParams.get('examType');
-    const stateParam = searchParams.get('state');
-    const quotaParam = searchParams.get('quota');
-    if (rankParam) setRank(rankParam);
-    if (catParam) setCategory(catParam);
-    if (examParam) setExamType(examParam);
-    if (stateParam) setState(stateParam);
-    if (quotaParam) setQuota(quotaParam);
-    if (rankParam && catParam && examParam && stateParam && quotaParam) setAutoSearch(true);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (autoSearch && rank && category && examType && state && quota) {
-      performSearch();
-      setAutoSearch(false);
-    }
-  }, [autoSearch, rank, category, examType, state, quota, performSearch]);
-
-  useEffect(() => {
-    if (examType === 'JEE Advanced') {
-      setQuota('AI');
-    } else if (examType === 'JEE Main') {
-      const mainExamQuotas = quotaOptions['JEE Main'];
-      if (!mainExamQuotas.includes(quota)) {
-        setQuota(mainExamQuotas[0] || 'OS');
-      }
-    }
-  }, [examType, quota]);
-
   const performSearch = useCallback(async () => {
     if (!rank.trim()) {
       setError('Please enter your rank.');
@@ -120,7 +88,37 @@ export default function RankPredictorPage() {
     }
   }, [rank, examType, category, quota, gender, isPreparatoryRank, state]);
 
+  useEffect(() => {
+    const rankParam = searchParams.get('rank');
+    const catParam = searchParams.get('cat');
+    const examParam = searchParams.get('examType');
+    const stateParam = searchParams.get('state');
+    const quotaParam = searchParams.get('quota');
+    if (rankParam) setRank(rankParam);
+    if (catParam) setCategory(catParam);
+    if (examParam) setExamType(examParam);
+    if (stateParam) setState(stateParam);
+    if (quotaParam) setQuota(quotaParam);
+    if (rankParam && catParam && examParam && stateParam && quotaParam) setAutoSearch(true);
+  }, [searchParams]);
 
+  useEffect(() => {
+    if (autoSearch && rank && category && examType && state && quota) {
+      performSearch();
+      setAutoSearch(false);
+    }
+  }, [autoSearch, rank, category, examType, state, quota, performSearch]);
+
+  useEffect(() => {
+    if (examType === 'JEE Advanced') {
+      setQuota('AI');
+    } else if (examType === 'JEE Main') {
+      const mainExamQuotas = quotaOptions['JEE Main'];
+      if (!mainExamQuotas.includes(quota)) {
+        setQuota(mainExamQuotas[0] || 'OS');
+      }
+    }
+  }, [examType, quota]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
