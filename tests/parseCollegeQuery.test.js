@@ -58,5 +58,4 @@ assert.equal(result.state, 'Gujarat');
 result = parseCollegeQuery('rank 1000 gandhinagar institutes');
 assert.equal(result.state, 'Gujarat');
 
-console.log('All tests passed');
 

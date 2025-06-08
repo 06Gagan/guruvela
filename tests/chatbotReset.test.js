@@ -61,4 +61,3 @@ assert.equal(bot.pendingCategory, null);
 assert.equal(bot.pendingState, '');
 assert.equal(bot.pendingExamType, 'JEE Main');
 
-console.log('Chatbot reset tests passed');
