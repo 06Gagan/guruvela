@@ -19,7 +19,9 @@ export default function ContentPage() {
 
   useEffect(() => {
     const fetchContent = async () => {
-      console.log(`ContentPage: useEffect triggered for slug: '${slug}', language from context: '${language}'`);
+      if (import.meta.env.DEV) {
+        console.log(`ContentPage: useEffect triggered for slug: '${slug}', language from context: '${language}'`);
+      }
       if (!slug) {
         setError('Page slug is missing.');
         setLoading(false);
@@ -32,7 +34,11 @@ export default function ContentPage() {
       setPageData(null);
       let currentLangToFetch = language;
       setDisplayLanguage(language);
-      console.log(`ContentPage: Attempting to fetch content for slug: '${slug}', language: '${currentLangToFetch}' from 'content_pages' table.`);
+      if (import.meta.env.DEV) {
+        console.log(
+          `ContentPage: Attempting to fetch content for slug: '${slug}', language: '${currentLangToFetch}' from 'content_pages' table.`
+        );
+      }
 
       try {
         let { data, error: supabaseError } = await supabase
@@ -41,7 +47,14 @@ export default function ContentPage() {
           .eq('slug', slug)
           .eq('language', currentLangToFetch);
 
-        console.log(`ContentPage: Initial fetch for '${currentLangToFetch}' - SupabaseError:`, supabaseError, `Data:`, data);
+        if (import.meta.env.DEV) {
+          console.log(
+            `ContentPage: Initial fetch for '${currentLangToFetch}' - SupabaseError:`,
+            supabaseError,
+            `Data:`,
+            data
+          );
+        }
 
         let foundContent = null;
 
@@ -49,7 +62,9 @@ export default function ContentPage() {
           console.error(`ContentPage: Supabase error on initial fetch for '${currentLangToFetch}':`, supabaseError.message);
         } else if (data && data.length === 1) {
           foundContent = data[0];
-          console.log(`ContentPage: Found one entry for slug '${slug}' in '${currentLangToFetch}'.`);
+          if (import.meta.env.DEV) {
+            console.log(`ContentPage: Found one entry for slug '${slug}' in '${currentLangToFetch}'.`);
+          }
         } else if (data && data.length > 1) {
           console.warn(`ContentPage: Found multiple entries (${data.length}) for slug '${slug}' in '${currentLangToFetch}'. Using the first one.`);
           foundContent = data[0]; 
@@ -64,7 +79,14 @@ export default function ContentPage() {
             .eq('slug', slug)
             .eq('language', 'en');
 
-          console.log(`ContentPage: English fallback fetch from 'content_pages' - FallbackError:`, fallbackError, `FallbackData:`, fallbackData);
+          if (import.meta.env.DEV) {
+            console.log(
+              `ContentPage: English fallback fetch from 'content_pages' - FallbackError:`,
+              fallbackError,
+              `FallbackData:`,
+              fallbackData
+            );
+          }
 
           if (fallbackError) {
             console.error(`ContentPage: Supabase error on English fallback fetch:`, fallbackError.message);
@@ -72,7 +94,9 @@ export default function ContentPage() {
           } else if (fallbackData && fallbackData.length === 1) {
             foundContent = fallbackData[0];
             setDisplayLanguage('en');
-            console.log(`ContentPage: Found one entry for slug '${slug}' in English (fallback from content_pages).`);
+            if (import.meta.env.DEV) {
+              console.log(`ContentPage: Found one entry for slug '${slug}' in English (fallback from content_pages).`);
+            }
           } else if (fallbackData && fallbackData.length > 1) {
             console.warn(`ContentPage: Found multiple entries (${fallbackData.length}) for slug '${slug}' in English (fallback from content_pages). Using the first one.`);
             foundContent = fallbackData[0];
@@ -87,7 +111,9 @@ export default function ContentPage() {
         if (foundContent) {
           setPageData(foundContent);
           setDisplayLanguage(foundContent.language);
-          console.log(`ContentPage: Successfully set pageData for language: ${foundContent.language}`);
+          if (import.meta.env.DEV) {
+            console.log(`ContentPage: Successfully set pageData for language: ${foundContent.language}`);
+          }
         } else if (!supabaseError) { 
           throw new Error(`Page "${slug}" content could not be loaded for language '${currentLangToFetch}' (from content_pages).`);
         }
@@ -97,14 +123,21 @@ export default function ContentPage() {
         setError(err.message);
       } finally {
         setLoading(false);
-        console.log(`ContentPage: fetchContent (content_pages) finished. Loading: false.`);
+        if (import.meta.env.DEV) {
+          console.log(`ContentPage: fetchContent (content_pages) finished. Loading: false.`);
+        }
       }
     };
 
     fetchContent();
   }, [slug, language]);
 
-  console.log(`ContentPage: Rendering component - Slug: ${slug}, Loading: ${loading}, Error: ${error}, PageData:`, pageData);
+  if (import.meta.env.DEV) {
+    console.log(
+      `ContentPage: Rendering component - Slug: ${slug}, Loading: ${loading}, Error: ${error}, PageData:`,
+      pageData
+    );
+  }
 
   if (loading) {
     return (
