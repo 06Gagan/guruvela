@@ -20,7 +20,7 @@ export default function ContentPage() {
   useEffect(() => {
     const fetchContent = async () => {
       if (import.meta.env.DEV) {
-        console.log(`ContentPage: useEffect triggered for slug: '${slug}', language from context: '${language}'`);
+        // useEffect triggered; helpful for debugging during development
       }
       if (!slug) {
         setError('Page slug is missing.');
@@ -35,9 +35,7 @@ export default function ContentPage() {
       let currentLangToFetch = language;
       setDisplayLanguage(language);
       if (import.meta.env.DEV) {
-        console.log(
-          `ContentPage: Attempting to fetch content for slug: '${slug}', language: '${currentLangToFetch}' from 'content_pages' table.`
-        );
+        // Attempting to fetch content for debugging
       }
 
       try {
@@ -48,12 +46,7 @@ export default function ContentPage() {
           .eq('language', currentLangToFetch);
 
         if (import.meta.env.DEV) {
-          console.log(
-            `ContentPage: Initial fetch for '${currentLangToFetch}' - SupabaseError:`,
-            supabaseError,
-            `Data:`,
-            data
-          );
+          // Log initial fetch result in development
         }
 
         let foundContent = null;
@@ -63,7 +56,7 @@ export default function ContentPage() {
         } else if (data && data.length === 1) {
           foundContent = data[0];
           if (import.meta.env.DEV) {
-            console.log(`ContentPage: Found one entry for slug '${slug}' in '${currentLangToFetch}'.`);
+            // Found one entry for slug in the requested language
           }
         } else if (data && data.length > 1) {
           console.warn(`ContentPage: Found multiple entries (${data.length}) for slug '${slug}' in '${currentLangToFetch}'. Using the first one.`);
@@ -80,12 +73,7 @@ export default function ContentPage() {
             .eq('language', 'en');
 
           if (import.meta.env.DEV) {
-            console.log(
-              `ContentPage: English fallback fetch from 'content_pages' - FallbackError:`,
-              fallbackError,
-              `FallbackData:`,
-              fallbackData
-            );
+            // Fallback fetch details for debugging
           }
 
           if (fallbackError) {
@@ -95,7 +83,7 @@ export default function ContentPage() {
             foundContent = fallbackData[0];
             setDisplayLanguage('en');
             if (import.meta.env.DEV) {
-              console.log(`ContentPage: Found one entry for slug '${slug}' in English (fallback from content_pages).`);
+              // Found one entry in English fallback
             }
           } else if (fallbackData && fallbackData.length > 1) {
             console.warn(`ContentPage: Found multiple entries (${fallbackData.length}) for slug '${slug}' in English (fallback from content_pages). Using the first one.`);
@@ -112,7 +100,7 @@ export default function ContentPage() {
           setPageData(foundContent);
           setDisplayLanguage(foundContent.language);
           if (import.meta.env.DEV) {
-            console.log(`ContentPage: Successfully set pageData for language: ${foundContent.language}`);
+            // Successfully set page data
           }
         } else if (!supabaseError) { 
           throw new Error(`Page "${slug}" content could not be loaded for language '${currentLangToFetch}' (from content_pages).`);
@@ -124,7 +112,7 @@ export default function ContentPage() {
       } finally {
         setLoading(false);
         if (import.meta.env.DEV) {
-          console.log(`ContentPage: fetchContent (content_pages) finished. Loading: false.`);
+          // Fetch operation finished in development
         }
       }
     };
@@ -133,10 +121,7 @@ export default function ContentPage() {
   }, [slug, language]);
 
   if (import.meta.env.DEV) {
-    console.log(
-      `ContentPage: Rendering component - Slug: ${slug}, Loading: ${loading}, Error: ${error}, PageData:`,
-      pageData
-    );
+    // Rendering component; useful debug information during development
   }
 
   if (loading) {

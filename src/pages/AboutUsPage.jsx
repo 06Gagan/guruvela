@@ -20,7 +20,7 @@ export default function AboutUsPage() {
   useEffect(() => {
     const fetchContent = async () => {
       if (import.meta.env.DEV) {
-        console.log(`AboutUsPage: useEffect triggered. Current language from context: ${language}`);
+        // useEffect triggered; helpful for debugging during development
       }
       setLoading(true);
       setError(null);
@@ -28,9 +28,7 @@ export default function AboutUsPage() {
       let currentLangToFetch = language;
       setDisplayLanguage(language);
       if (import.meta.env.DEV) {
-        console.log(
-          `AboutUsPage: Attempting to fetch content from 'static_page_content' for page_identifier: '${PAGE_IDENTIFIER}', language_code: '${currentLangToFetch}'`
-        );
+        // Attempting to fetch content from Supabase for debugging
       }
 
       try {
@@ -42,17 +40,12 @@ export default function AboutUsPage() {
           .single();
 
         if (import.meta.env.DEV) {
-          console.log(
-            `AboutUsPage: Initial fetch for '${currentLangToFetch}' - Data:`,
-            data,
-            `SupabaseError:`,
-            supabaseError
-          );
+          // Log initial fetch result in development
         }
 
         if (supabaseError || !data) {
           if (import.meta.env.DEV) {
-            console.log(`AboutUsPage: Initial fetch failed or no data. SupabaseError: ${supabaseError?.message}, Data: ${data}`);
+            // Initial fetch failed or no data
           }
           if (currentLangToFetch !== 'en') {
             console.warn(`AboutUsPage: Content in '${currentLangToFetch}' not found or error occurred. Trying English fallback for 'static_page_content'.`);
@@ -65,12 +58,7 @@ export default function AboutUsPage() {
               .single();
             
             if (import.meta.env.DEV) {
-              console.log(
-                `AboutUsPage: English fallback fetch from 'static_page_content' - FallbackData:`,
-                fallbackData,
-                `FallbackError:`,
-                fallbackError
-              );
+              // Fallback fetch details for debugging
             }
 
             if (fallbackError || !fallbackData) {
@@ -81,7 +69,7 @@ export default function AboutUsPage() {
             setContent(fallbackData);
             setDisplayLanguage('en');
             if (import.meta.env.DEV) {
-              console.log(`AboutUsPage: Successfully set content from English fallback (static_page_content).`);
+              // Successfully set content from English fallback
             }
           } else {
             const mainErrorMsg = supabaseError?.message || `About Us page content (from static_page_content) not found for ${currentLangToFetch} and identifier '${PAGE_IDENTIFIER}'.`;
@@ -92,7 +80,7 @@ export default function AboutUsPage() {
           setContent(data);
           setDisplayLanguage(data.language_code);
           if (import.meta.env.DEV) {
-            console.log(`AboutUsPage: Successfully set content from 'static_page_content' for language: ${data.language_code}`);
+            // Successfully set content from Supabase
           }
         }
       } catch (err) {
@@ -101,7 +89,7 @@ export default function AboutUsPage() {
       } finally {
         setLoading(false);
         if (import.meta.env.DEV) {
-          console.log(`AboutUsPage: fetchContent (static_page_content) finished. Loading: false.`);
+          // Fetch operation finished in development
         }
       }
     };
@@ -110,11 +98,7 @@ export default function AboutUsPage() {
   }, [language]);
 
   if (import.meta.env.DEV) {
-    console.log(
-      `AboutUsPage: Rendering component - Loading: ${loading}, Error: ${error}, Content:`,
-      content,
-      `DisplayLanguage: ${displayLanguage}`
-    );
+    // Rendering component; useful debug information during development
   }
 
   if (loading) {
