@@ -1,5 +1,5 @@
 // src/pages/RankPredictorPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
 import {
@@ -67,14 +67,14 @@ export default function RankPredictorPage() {
     if (stateParam) setState(stateParam);
     if (quotaParam) setQuota(quotaParam);
     if (rankParam && catParam && examParam && stateParam && quotaParam) setAutoSearch(true);
-  }, []); // run once on mount
+  }, [searchParams]);
 
   useEffect(() => {
     if (autoSearch && rank && category && examType && state && quota) {
-      handleSubmit();
+      performSearch();
       setAutoSearch(false);
     }
-  }, [autoSearch, rank, category, examType, state, quota]);
+  }, [autoSearch, rank, category, examType, state, quota, performSearch]);
 
   useEffect(() => {
     if (examType === 'JEE Advanced') {
@@ -87,17 +87,7 @@ export default function RankPredictorPage() {
     }
   }, [examType, quota]);
 
-  useEffect(() => {
-    if (examType === 'JEE Main') {
-      setQuota(quotaOptions['JEE Main'][0] || 'OS');
-    } else if (examType === 'JEE Advanced') {
-      setQuota('AI');
-    }
-  }, []);
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const performSearch = useCallback(async () => {
     if (!rank.trim()) {
       setError('Please enter your rank.');
       setResults([]);
@@ -128,6 +118,13 @@ export default function RankPredictorPage() {
     } finally {
       setIsLoading(false);
     }
+  }, [rank, examType, category, quota, gender, isPreparatoryRank, state]);
+
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    performSearch();
   };
 
   return (
