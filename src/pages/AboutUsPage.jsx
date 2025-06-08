@@ -19,13 +19,19 @@ export default function AboutUsPage() {
 
   useEffect(() => {
     const fetchContent = async () => {
-      console.log(`AboutUsPage: useEffect triggered. Current language from context: ${language}`);
+      if (import.meta.env.DEV) {
+        console.log(`AboutUsPage: useEffect triggered. Current language from context: ${language}`);
+      }
       setLoading(true);
       setError(null);
       setContent(null);
       let currentLangToFetch = language;
       setDisplayLanguage(language);
-      console.log(`AboutUsPage: Attempting to fetch content from 'static_page_content' for page_identifier: '${PAGE_IDENTIFIER}', language_code: '${currentLangToFetch}'`);
+      if (import.meta.env.DEV) {
+        console.log(
+          `AboutUsPage: Attempting to fetch content from 'static_page_content' for page_identifier: '${PAGE_IDENTIFIER}', language_code: '${currentLangToFetch}'`
+        );
+      }
 
       try {
         let { data, error: supabaseError } = await supabase
@@ -35,10 +41,19 @@ export default function AboutUsPage() {
           .eq('language_code', currentLangToFetch)
           .single();
 
-        console.log(`AboutUsPage: Initial fetch for '${currentLangToFetch}' - Data:`, data, `SupabaseError:`, supabaseError);
+        if (import.meta.env.DEV) {
+          console.log(
+            `AboutUsPage: Initial fetch for '${currentLangToFetch}' - Data:`,
+            data,
+            `SupabaseError:`,
+            supabaseError
+          );
+        }
 
         if (supabaseError || !data) {
-          console.log(`AboutUsPage: Initial fetch failed or no data. SupabaseError: ${supabaseError?.message}, Data: ${data}`);
+          if (import.meta.env.DEV) {
+            console.log(`AboutUsPage: Initial fetch failed or no data. SupabaseError: ${supabaseError?.message}, Data: ${data}`);
+          }
           if (currentLangToFetch !== 'en') {
             console.warn(`AboutUsPage: Content in '${currentLangToFetch}' not found or error occurred. Trying English fallback for 'static_page_content'.`);
             
@@ -49,7 +64,14 @@ export default function AboutUsPage() {
               .eq('language_code', 'en')
               .single();
             
-            console.log(`AboutUsPage: English fallback fetch from 'static_page_content' - FallbackData:`, fallbackData, `FallbackError:`, fallbackError);
+            if (import.meta.env.DEV) {
+              console.log(
+                `AboutUsPage: English fallback fetch from 'static_page_content' - FallbackData:`,
+                fallbackData,
+                `FallbackError:`,
+                fallbackError
+              );
+            }
 
             if (fallbackError || !fallbackData) {
               const mainErrorMsg = fallbackError?.message || `About Us page content (from static_page_content) not found in English either for identifier '${PAGE_IDENTIFIER}'.`;
@@ -58,7 +80,9 @@ export default function AboutUsPage() {
             }
             setContent(fallbackData);
             setDisplayLanguage('en');
-            console.log(`AboutUsPage: Successfully set content from English fallback (static_page_content).`);
+            if (import.meta.env.DEV) {
+              console.log(`AboutUsPage: Successfully set content from English fallback (static_page_content).`);
+            }
           } else {
             const mainErrorMsg = supabaseError?.message || `About Us page content (from static_page_content) not found for ${currentLangToFetch} and identifier '${PAGE_IDENTIFIER}'.`;
             console.error(`AboutUsPage: Error fetching English content or no data and no fallback (static_page_content). Error: ${mainErrorMsg}`);
@@ -67,21 +91,31 @@ export default function AboutUsPage() {
         } else {
           setContent(data);
           setDisplayLanguage(data.language_code);
-          console.log(`AboutUsPage: Successfully set content from 'static_page_content' for language: ${data.language_code}`);
+          if (import.meta.env.DEV) {
+            console.log(`AboutUsPage: Successfully set content from 'static_page_content' for language: ${data.language_code}`);
+          }
         }
       } catch (err) {
         console.error(`AboutUsPage: Error caught in fetchContent (static_page_content) - Message: ${err.message}`, err);
         setError(err.message);
       } finally {
         setLoading(false);
-        console.log(`AboutUsPage: fetchContent (static_page_content) finished. Loading: false.`);
+        if (import.meta.env.DEV) {
+          console.log(`AboutUsPage: fetchContent (static_page_content) finished. Loading: false.`);
+        }
       }
     };
 
     fetchContent();
   }, [language]);
 
-  console.log(`AboutUsPage: Rendering component - Loading: ${loading}, Error: ${error}, Content:`, content, `DisplayLanguage: ${displayLanguage}`);
+  if (import.meta.env.DEV) {
+    console.log(
+      `AboutUsPage: Rendering component - Loading: ${loading}, Error: ${error}, Content:`,
+      content,
+      `DisplayLanguage: ${displayLanguage}`
+    );
+  }
 
   if (loading) {
     return (
