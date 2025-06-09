@@ -46,7 +46,8 @@ export async function fetchCollegePredictions({
 
   query = query.eq('is_preparatory', isPreparatoryRank);
   query = query.gte('closing_rank', userRankInt);
-  query = query.order('closing_rank', { ascending: true }).limit(100);
+  // Increase limit so that colleges like IIITs aren't accidentally filtered out
+  query = query.order('closing_rank', { ascending: true }).limit(1000);
 
   const { data, error } = await query;
   if (error) {
