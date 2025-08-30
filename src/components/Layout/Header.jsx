@@ -68,12 +68,12 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-primary to-accent-alt text-white shadow-md sticky top-0 z-50">
       <nav className="container mx-auto px-4 py-4" aria-label="Main navigation">
         <div className="flex items-center justify-between">
-          <Link 
-            to="/" 
-            className="text-2xl font-bold text-primary hover:text-blue-600 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/50 rounded-lg" 
+          <Link
+            to="/"
+            className="text-2xl font-bold text-white hover:text-accent-alt transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-white/50 rounded-lg"
             onClick={closeAllDropdowns} // Close all if home is clicked
             aria-label="Guruvela Home"
           >
@@ -85,7 +85,7 @@ export default function Header() {
             <button
               type="button"
               onClick={toggleMobileMenu} // Use the specific toggle function
-              className="p-2 text-gray-600 hover:text-primary hover:bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors duration-150"
+              className="p-2 text-white hover:text-accent-alt hover:bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors duration-150"
               aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu-panel" // Ensure this matches the id of the panel
@@ -101,14 +101,14 @@ export default function Header() {
           </div>
 
           {/* Navigation Links Panel (Mobile Menu Panel) */}
-          <div 
+          <div
             id="mobile-menu-panel" // Added ID for aria-controls
             ref={mobileMenuRef}  // Assign ref to the panel itself
             className={`
-              absolute top-full left-0 w-full bg-white shadow-lg md:shadow-none 
-              md:static md:w-auto md:flex md:items-center md:space-x-1 lg:space-x-3 
+              absolute top-full left-0 w-full bg-gradient-to-b from-primary to-accent-alt shadow-lg md:shadow-none
+              md:static md:w-auto md:flex md:items-center md:space-x-1 lg:space-x-3
               ${isMobileMenuOpen ? 'block' : 'hidden'}
-              transition-all duration-300 ease-in-out z-40 
+              transition-all duration-300 ease-in-out z-40
               md:p-0
             `}
           >
@@ -119,8 +119,8 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsPredictorDropdownOpen(prev => !prev)}
                   className={`w-full text-left md:text-center py-2 px-1 md:px-2 rounded-lg flex items-center justify-between md:justify-start transition-colors duration-150
-                    ${isPredictorDropdownOpen ? 'text-primary bg-gray-50' : 'text-gray-600 hover:text-primary hover:bg-gray-50'}
-                    focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                    ${isPredictorDropdownOpen ? 'text-accent bg-white/10' : 'text-white hover:text-accent hover:bg-white/10'}
+                    focus:outline-none focus:ring-2 focus:ring-white/50`}
                   aria-expanded={isPredictorDropdownOpen}
                   aria-controls="predictor-dropdown"
                 >
@@ -159,8 +159,8 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsDocumentsDropdownOpen(prev => !prev)}
                   className={`w-full text-left md:text-center py-2 px-1 md:px-2 rounded-lg flex items-center justify-between md:justify-start transition-colors duration-150
-                    ${isDocumentsDropdownOpen ? 'text-primary bg-gray-50' : 'text-gray-600 hover:text-primary hover:bg-gray-50'}
-                    focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                    ${isDocumentsDropdownOpen ? 'text-accent bg-white/10' : 'text-white hover:text-accent hover:bg-white/10'}
+                    focus:outline-none focus:ring-2 focus:ring-white/50`}
                   aria-expanded={isDocumentsDropdownOpen}
                   aria-controls="documents-dropdown"
                 >
@@ -197,7 +197,7 @@ export default function Header() {
 
               <Link 
                 to="/preference-guides"
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/preference-guides') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/preference-guides') ? 'nav-link-active bg-white/10' : ''}`}
                 onClick={closeAllDropdowns} // Close all
               >
                 Preference Guides
@@ -205,28 +205,28 @@ export default function Header() {
 
               <Link 
                 to="/mentors" 
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/mentors') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/mentors') ? 'nav-link-active bg-white/10' : ''}`}
                 onClick={closeAllDropdowns} // Close all
               >
                 Mentors
               </Link>
               <Link 
                 to="/about-us" 
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/about-us') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/about-us') ? 'nav-link-active bg-white/10' : ''}`}
                 onClick={closeAllDropdowns} // Close all
               >
                 About
               </Link>
               <Link 
                 to="/how-to-use" 
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/how-to-use') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/how-to-use') ? 'nav-link-active bg-white/10' : ''}`}
                 onClick={closeAllDropdowns} // Close all
               >
                 How to Use
               </Link>
               <Link 
                 to="/faqs" 
-                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/faqs') ? 'nav-link-active bg-gray-50' : ''}`}
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/faqs') ? 'nav-link-active bg-white/10' : ''}`}
                 onClick={closeAllDropdowns} // Close all
               >
                 FAQ & Guides
@@ -238,8 +238,8 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsLangDropdownOpen(prev => !prev)}
                   className={`w-full text-left md:text-center py-2 px-1 md:px-2 rounded-lg flex items-center justify-between md:justify-start transition-colors duration-150
-                    ${isLangDropdownOpen ? 'text-primary bg-gray-50' : 'text-gray-600 hover:text-primary hover:bg-gray-50'}
-                    focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                    ${isLangDropdownOpen ? 'text-accent bg-white/10' : 'text-white hover:text-accent hover:bg-white/10'}
+                    focus:outline-none focus:ring-2 focus:ring-white/50`}
                   aria-expanded={isLangDropdownOpen}
                   aria-controls="language-dropdown"
                 >

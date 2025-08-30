@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-800 font-sans antialiased;
+    @apply bg-gradient-to-br from-primary/10 via-white to-accent/10 text-gray-800 font-sans antialiased;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -23,13 +23,13 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary text-white hover:bg-blue-700
-           focus:ring-primary/50 active:bg-blue-800;
+    @apply btn bg-primary text-white hover:bg-purple-700
+           focus:ring-primary/50 active:bg-purple-800;
   }
 
   .btn-accent {
-    @apply btn bg-accent text-white hover:bg-orange-800
-           focus:ring-accent/50 active:bg-orange-900;
+    @apply btn bg-accent text-white hover:bg-amber-600
+           focus:ring-accent/50 active:bg-amber-700;
   }
 
   .btn-outline {
@@ -60,11 +60,11 @@
 
   /* Navigation */
   .nav-link {
-    @apply text-gray-600 hover:text-primary transition-colors;
+    @apply text-white hover:text-accent transition-colors;
   }
 
   .nav-link-active {
-    @apply text-primary font-medium;
+    @apply text-accent font-medium;
   }
 
   /* Chat Interface */
