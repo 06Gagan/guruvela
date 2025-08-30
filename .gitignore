@@ -6,3 +6,6 @@ dist
 *.env
 *.local
 *.zip
+.yarn/
+.yarnrc.yml
+package-lock.json

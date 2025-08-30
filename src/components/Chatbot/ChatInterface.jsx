@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { supabase } from '../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { parseCollegeQuery } from '../../lib/parseCollegeQuery';
 import { fetchCollegePredictions as fetchPredictions } from '../../lib/fetchCollegePredictions';
@@ -123,6 +123,28 @@ export default function ChatInterface() {
     setPendingState('');
     setPendingExamType('JEE Main');
   };
+
+  const handleResetConversation = () => {
+    resetPending();
+    setChatHistory([
+      {
+        type: 'bot',
+        content: currentUiText.greeting,
+        suggestions: currentCategories,
+        relatedContent: null,
+        showHowToUseSuggestion: false,
+      },
+    ]);
+    initialLoadDoneRef.current = false;
+  };
+
+  useEffect(() => {
+    document.title = 'Guruvela Assistant';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Chat with Guruvela assistant about JoSAA and CSAB counselling');
+    }
+  }, []);
 
   useEffect(() => {
     const langTrans = uiTranslations[language] || uiTranslations.en;
@@ -317,9 +339,20 @@ export default function ChatInterface() {
     return `/pages/${slug}`;
   };
 
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="max-w-4xl mx-auto p-4">
+        <div className="p-4 text-center text-red-700 bg-red-50 rounded">Backend unavailable. Please try again later.</div>
+      </div>
+    );
+  }
+
   return (
     // Make this outer div a flex container that grows to fill available vertical space
-    <div className="max-w-4xl mx-auto flex-grow flex flex-col"> 
+    <div className="max-w-4xl mx-auto flex-grow flex flex-col">
+      <div className="flex justify-end mb-4">
+        <button onClick={handleResetConversation} className="btn-outline text-sm">Reset Conversation</button>
+      </div>
       {showPredictorPromo && (
         <div className="relative bg-gray-100 border border-gray-200 p-3 sm:p-4 mb-4 rounded-lg shadow flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
           <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-0 sm:mr-4">
@@ -353,6 +386,7 @@ export default function ChatInterface() {
           className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
           role="log"
           aria-label="Chat messages"
+          aria-live="polite"
         >
           {chatHistory.map((msg, index) => (
             <div

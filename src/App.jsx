@@ -3,65 +3,72 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import MainLayout from './components/Layout/MainLayout';
 import ChatInterface from './components/Chatbot/ChatInterface';
-import ContentPage from './pages/ContentPage';
-import FAQListPage from './pages/FAQListPage';
-import RankPredictorPage from './pages/RankPredictorPage';
-import CsabRankPredictorPage from './pages/CsabRankPredictorPage';
-import MentorsPage from './pages/MentorsPage';
-import HowToUsePage from './pages/HowToUsePage';
-import AboutUsPage from './pages/AboutUsPage';
-import JosaaDocumentsPage from './pages/JosaaDocumentsPage';
-import PreferenceGuidesPage from './pages/PreferenceGuidesPage';
+const ContentPage = lazy(() => import('./pages/ContentPage'));
+const FAQListPage = lazy(() => import('./pages/FAQListPage'));
+const RankPredictorPage = lazy(() => import('./pages/RankPredictorPage'));
+const CsabRankPredictorPage = lazy(() => import('./pages/CsabRankPredictorPage'));
+const MentorsPage = lazy(() => import('./pages/MentorsPage'));
+const HowToUsePage = lazy(() => import('./pages/HowToUsePage'));
+const AboutUsPage = lazy(() => import('./pages/AboutUsPage'));
+const JosaaDocumentsPage = lazy(() => import('./pages/JosaaDocumentsPage'));
+const PreferenceGuidesPage = lazy(() => import('./pages/PreferenceGuidesPage'));
 import { LanguageProvider } from './contexts/LanguageContext';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react"; // Import Vercel Analytics
+
+const withSuspense = (Component) => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <Component />
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      {
+      { 
         index: true,
         element: <ChatInterface />
       },
       {
         path: "about-us",
-        element: <AboutUsPage />
+        element: withSuspense(AboutUsPage)
       },
       {
         path: "how-to-use",
-        element: <HowToUsePage />
+        element: withSuspense(HowToUsePage)
       },
       {
         path: "josaa-documents",
-        element: <JosaaDocumentsPage />
+        element: withSuspense(JosaaDocumentsPage)
       },
       {
-        path: "preference-guides", 
-        element: <PreferenceGuidesPage />
+        path: "preference-guides",
+        element: withSuspense(PreferenceGuidesPage)
       },
       {
         path: "pages/:slug",
-        element: <ContentPage />
+        element: withSuspense(ContentPage)
       },
       {
         path: "faqs",
-        element: <FAQListPage />
+        element: withSuspense(FAQListPage)
       },
       {
         path: "rank-predictor",
-        element: <RankPredictorPage />
+        element: withSuspense(RankPredictorPage)
       },
       {
         path: "csab-predictor",
-        element: <CsabRankPredictorPage />
+        element: withSuspense(CsabRankPredictorPage)
       },
       {
         path: "mentors",
-        element: <MentorsPage />
+        element: withSuspense(MentorsPage)
       }
     ]
   }
