@@ -1,7 +1,8 @@
 // src/pages/RankPredictorPage.jsx
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
+import { isSupabaseConfigured } from '../lib/supabase';
 import {
   JOSAA_PREDICTION_YEAR,
   JOSAA_PREDICTION_ROUND,
@@ -21,12 +22,22 @@ export default function RankPredictorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const [autoSearch, setAutoSearch] = useState(false);
 
   const { language } = useLanguage();
 
   const [searchParams] = useSearchParams();
+  const lastRequestRef = useRef(0);
+
+  useEffect(() => {
+    document.title = 'JoSAA College Predictor | Guruvela';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Find potential colleges based on JoSAA cutoffs');
+    }
+  }, []);
 
   // Corrected link
   const preparatoryGuideLink = "/pages/iit-prep-course-guide";
@@ -56,6 +67,11 @@ export default function RankPredictorPage() {
   const uiText = pageTranslations[language] || pageTranslations.en;
 
   const performSearch = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastRequestRef.current < 1000) {
+      return;
+    }
+    lastRequestRef.current = now;
     if (!rank.trim()) {
       setError('Please enter your rank.');
       setResults([]);
@@ -87,6 +103,21 @@ export default function RankPredictorPage() {
       setIsLoading(false);
     }
   }, [rank, examType, category, quota, gender, isPreparatoryRank, state]);
+
+  const handleCopyLink = () => {
+    const params = new URLSearchParams({
+      rank,
+      examType,
+      cat: category,
+      state,
+      quota,
+    });
+    const url = `${window.location.origin}/rank-predictor?${params.toString()}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
     const rankParam = searchParams.get('rank');
@@ -127,6 +158,9 @@ export default function RankPredictorPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {!isSupabaseConfigured && (
+        <div className="mb-4 p-3 text-center text-red-700 bg-red-50 rounded">Backend unavailable. Please try again later.</div>
+      )}
       <div className="flex justify-start mb-4">
         <Link
           to="/"
@@ -318,13 +352,16 @@ export default function RankPredictorPage() {
 
       {!isLoading && results.length > 0 && (
         <div className="card overflow-hidden p-0">
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">
               Potential Colleges
               <span className="text-sm font-normal text-gray-500 ml-2">
                 (JoSAA Round {JOSAA_PREDICTION_ROUND}, {JOSAA_PREDICTION_YEAR})
               </span>
             </h2>
+            <button onClick={handleCopyLink} className="btn-outline text-sm whitespace-nowrap">
+              {copied ? 'Copied!' : 'Copy Results Link'}
+            </button>
           </div>
 
           <div className="overflow-x-auto">

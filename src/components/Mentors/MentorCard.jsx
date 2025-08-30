@@ -27,6 +27,9 @@ export default function MentorCard({ mentor, fallbackGroupLink }) {
       <img
         src={imageUrl}
         alt={`Profile of ${name}`}
+        width={128}
+        height={128}
+        loading="lazy"
         className="w-32 h-32 rounded-full object-cover mb-4 shadow-md border-2 border-gray-200"
         onError={(e) => {
           e.target.onerror = null;

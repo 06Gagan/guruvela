@@ -17,6 +17,14 @@ export default function MentorsPage() {
 
 
   useEffect(() => {
+    document.title = 'Mentors | Guruvela';
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', 'Connect with mentors for counselling guidance');
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchMentors = async () => {
       setLoading(true);
       setError(null);
