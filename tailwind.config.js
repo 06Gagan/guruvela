@@ -8,12 +8,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#2563EB',    // blue-600
-        accent: '#C2410C',     // orange-700
-        'accent-alt': '#10B981', // emerald-500
+        primary: '#6366F1',      // indigo-500
+        accent: '#D946EF',       // fuchsia-500
+        'accent-alt': '#0EA5E9', // sky-500
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'Poppins', 'Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
