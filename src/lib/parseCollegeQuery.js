@@ -32,6 +32,13 @@ export const categoryMap = {
   open: 'OPEN'
 };
 
+const categoryRegexMap = new Map(
+  Object.entries(categoryMap).map(([key, value]) => {
+    const escaped = key.replace(/[-\\*+?.()|[\]{}]/g, '\\$&');
+    return [new RegExp(`\\b${escaped}\\b`, 'i'), value];
+  })
+);
+
 export const stateKeywords = {
   'andhra pradesh': 'Andhra Pradesh',
   'arunachal pradesh': 'Arunachal Pradesh',
@@ -95,8 +102,8 @@ export function parseCollegeQuery(text) {
   const rank = rankStr ? parseInt(rankStr, 10) : null;
 
   let category = null;
-  for (const [key, value] of Object.entries(categoryMap)) {
-    if (lower.includes(key.toLowerCase())) { category = value; break; }
+  for (const [regex, value] of categoryRegexMap) {
+    if (regex.test(lower)) { category = value; break; }
   }
   const branchMatch = text.match(/\b(CSE|Computer Science|ECE|Electrical|Electronics|Mechanical|Civil|IT|Information Technology)\b/i);
   const branch = branchMatch ? branchMatch[0] : null;
