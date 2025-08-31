@@ -59,3 +59,10 @@ result = parseCollegeQuery('rank 1000 gandhinagar institutes');
 assert.equal(result.state, 'Gujarat');
 
 
+result = parseCollegeQuery('I love science');
+assert.equal(result.category, null);
+
+result = parseCollegeQuery('scam details');
+assert.equal(result.category, null);
+
+
