@@ -310,7 +310,7 @@ export default function ChatInterface() {
       }
     } else {
       if (isGeminiConfigured) {
-        const geminiResponse = await getGenerativeResponse(currentMessageText);
+        const geminiResponse = await getGenerativeResponse(currentMessageText, language);
         response = { content: geminiResponse, relatedContent: null, showHowToUseSuggestion: false };
       } else {
         response = await findBestResponse(currentMessageText, language);

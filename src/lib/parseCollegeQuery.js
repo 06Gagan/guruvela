@@ -128,6 +128,6 @@ export function parseCollegeQuery(text) {
   } else if (/\bjee\s*mains?\b/.test(lower) || /\bjee[-\s]?main\b/.test(lower)) {
     examType = 'JEE Main';
   }
-  const isCollegeQuery = rank !== null || branch || institute || lower.includes('college');
+  const isCollegeQuery = rank !== null || branch !== null || institute !== null;
   return { rank, category, branch, institute, state, examType, isCollegeQuery };
 }

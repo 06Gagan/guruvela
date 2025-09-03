@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { parseCollegeQuery } from '../src/lib/parseCollegeQuery.js';
 
 // Mock Gemini service
-const mockGetGenerativeResponse = async (prompt) => {
-  return `This is a Gemini response to: ${prompt}`;
+const mockGetGenerativeResponse = async (prompt, language = 'en') => {
+  return `This is a Gemini response to: ${prompt} in ${language}`;
 };
 
 // Mock Predictions service
@@ -62,7 +62,7 @@ class DummyChatbotWithGemini {
     } else {
       if (this.isGeminiConfigured) {
         responseType = 'gemini';
-        await mockGetGenerativeResponse(text);
+        await mockGetGenerativeResponse(text, 'en'); // Pass language
       } else {
         // This would call findBestResponse in the real app
         responseType = 'fallback_no_gemini';
@@ -95,6 +95,10 @@ class DummyChatbotWithGemini {
   bot = new DummyChatbotWithGemini(false);
   flow = await bot.handle('hello world');
   assert.equal(flow, 'fallback_no_gemini', 'Test Case 5 Failed: General query should use fallback when Gemini is not configured.');
+
+  bot = new DummyChatbotWithGemini(true);
+  flow = await bot.handle('what are some good colleges?');
+  assert.equal(flow, 'gemini', 'Test Case 6 Failed: General query with "college" should be routed to Gemini.');
 
   console.log('All Gemini integration tests passed!');
 })().catch(err => {
