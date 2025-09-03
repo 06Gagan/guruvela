@@ -7,6 +7,7 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { parseCollegeQuery } from '../../lib/parseCollegeQuery';
 import { fetchCollegePredictions as fetchPredictions } from '../../lib/fetchCollegePredictions';
+import { getGenerativeResponse, isGeminiConfigured } from '../../lib/gemini';
 import { JOSAA_PREDICTION_YEAR, JOSAA_PREDICTION_ROUND } from '../../config/constants';
 
 const initialCategoriesBase = [
@@ -269,9 +270,10 @@ export default function ChatInterface() {
 
     const quotaForExam = examType === 'JEE Advanced' ? 'AI' : 'OS';
     const hasAllParams = rank && category;
-    const isPotentialCollegeQuery = parsed.isCollegeQuery || hasAllParams;
+    const isRankQuery = parsed.isCollegeQuery || hasAllParams;
     let response;
-    if (isPotentialCollegeQuery) {
+
+    if (isRankQuery) {
       if (!rank || !category) {
         response = { content: currentUiText.clarifyMissingInfo, relatedContent: null, showHowToUseSuggestion: false };
       } else {
@@ -307,7 +309,12 @@ export default function ChatInterface() {
         resetPending();
       }
     } else {
-      response = await findBestResponse(currentMessageText, language);
+      if (isGeminiConfigured) {
+        const geminiResponse = await getGenerativeResponse(currentMessageText);
+        response = { content: geminiResponse, relatedContent: null, showHowToUseSuggestion: false };
+      } else {
+        response = await findBestResponse(currentMessageText, language);
+      }
       resetPending();
     }
     const newBotMessage = {
