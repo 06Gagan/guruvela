@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { parseCollegeQuery } from '../src/lib/parseCollegeQuery.js';
 
 // Mock Gemini service
-const mockGetGenerativeResponse = async (prompt) => {
-  return `This is a Gemini response to: ${prompt}`;
+const mockGetGenerativeResponse = async (prompt, language = 'en') => {
+  return `This is a Gemini response to: ${prompt} in ${language}`;
 };
 
 // Mock Predictions service
@@ -62,7 +62,7 @@ class DummyChatbotWithGemini {
     } else {
       if (this.isGeminiConfigured) {
         responseType = 'gemini';
-        await mockGetGenerativeResponse(text);
+        await mockGetGenerativeResponse(text, 'en'); // Pass language
       } else {
         // This would call findBestResponse in the real app
         responseType = 'fallback_no_gemini';
