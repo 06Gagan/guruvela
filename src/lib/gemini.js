@@ -32,7 +32,7 @@ export async function getGenerativeResponse(prompt, language = 'en') {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
+      model: "gemini-1.0-pro",
       generationConfig: {
         maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
       },
