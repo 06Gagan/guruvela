@@ -45,7 +45,7 @@ export default function RankPredictorPage() {
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
   const quotaOptions = {
     // Default to OS for JEE Main as it is the most common scenario
-    'JEE Main': ["OS", "HS", "AI", "GO"],
+    'JEE Main': ["OS", "HS","GO"],
     'JEE Advanced': ["AI"]
   };
   const genderOptions = ["Gender-Neutral", "Female-only (including Supernumerary)"];
