@@ -96,6 +96,10 @@ class DummyChatbotWithGemini {
   flow = await bot.handle('hello world');
   assert.equal(flow, 'fallback_no_gemini', 'Test Case 5 Failed: General query should use fallback when Gemini is not configured.');
 
+  bot = new DummyChatbotWithGemini(true);
+  flow = await bot.handle('what are some good colleges?');
+  assert.equal(flow, 'gemini', 'Test Case 6 Failed: General query with "college" should be routed to Gemini.');
+
   console.log('All Gemini integration tests passed!');
 })().catch(err => {
   console.error('Test failed:', err.message);
