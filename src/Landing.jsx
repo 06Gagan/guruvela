@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { Sparkles, Menu, X } from 'lucide-react';
 
 // Helper component for keyboard key badges
 const KeyBadge = ({ children, className }) => (
   <div
-    className={`absolute bg-white/80 backdrop-blur-sm shadow-md rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 ring-1 ring-gray-900/5 ${className}`}
+    className={`absolute bg-background border border-border shadow-subtle rounded-lg px-3 py-2 text-sm font-medium text-muted transition-transform hover:-translate-y-1 ${className}`}
   >
     {children}
   </div>
@@ -11,7 +12,7 @@ const KeyBadge = ({ children, className }) => (
 
 // Helper component for feature chips
 const FeatureChip = ({ children }) => (
-  <div className="bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium text-gray-800 ring-1 ring-gray-900/10">
+  <div className="border border-border bg-background rounded-full px-4 py-2 text-sm font-medium text-foreground">
     {children}
   </div>
 );
@@ -19,14 +20,14 @@ const FeatureChip = ({ children }) => (
 // Helper component for demo overlay chips
 const DemoChip = ({ children, className }) => (
   <div
-    className={`absolute bg-white/80 backdrop-blur-md rounded-full px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-900/10 shadow-lg ${className}`}
+    className={`absolute bg-background/80 backdrop-blur-sm border border-border shadow-lg rounded-full px-4 py-2 text-sm font-medium text-foreground ${className}`}
   >
     {children}
   </div>
 );
 
 const Landing = ({
-  logoSrc = 'https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600',
+  logoSrc = 'https://tailwindui.com/img/logos/mark.svg?color=black',
   demoSrc = 'https://tailwindui.com/img/screenshots/abstract-application-demo-light.png',
   macCtaLink = '#',
   windowsCtaLink = '#',
@@ -34,12 +35,9 @@ const Landing = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white text-gray-800 font-sans">
-      {/* Background Gradient & Vignette */}
-      <div className="absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(217,239,255,0.5),rgba(255,255,255,0))]"></div>
-
+    <div className="min-h-screen bg-background text-muted font-sans">
       {/* Header */}
-      <header className="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0">
             <a href="#" title="Your Company">
@@ -47,47 +45,43 @@ const Landing = ({
             </a>
           </div>
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">Product</a>
-            <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">Features</a>
-            <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">Pricing</a>
+            <a href="#" className="text-sm font-medium text-muted hover:text-foreground transition-colors">Product</a>
+            <a href="#" className="text-sm font-medium text-muted hover:text-foreground transition-colors">Features</a>
+            <a href="#" className="text-sm font-medium text-muted hover:text-foreground transition-colors">Pricing</a>
           </nav>
           <div className="hidden md:flex items-center space-x-4">
-             <a href="#" className="text-sm font-semibold text-gray-700 hover:text-gray-900">Log in</a>
-             <a href="#" className="px-4 py-2 text-sm font-semibold text-white bg-gray-800 rounded-lg hover:bg-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800">
+             <a href="#" className="text-sm font-semibold text-muted hover:text-foreground transition-colors">Log in</a>
+             <a href="#" className="px-4 py-2 text-sm font-semibold text-background bg-foreground rounded-lg hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground">
                 Sign up
              </a>
           </div>
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted hover:text-foreground hover:bg-subtle focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent"
               aria-expanded={isMenuOpen}
             >
               <span className="sr-only">Open main menu</span>
               {isMenuOpen ? (
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
+                <Menu className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
           </div>
         </div>
         {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg mt-2">
+          <div className="md:hidden absolute top-full left-0 w-full bg-background shadow-lg rounded-b-lg mt-2 border-t border-border">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Product</a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Features</a>
-              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Pricing</a>
+              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-muted hover:text-foreground hover:bg-subtle">Product</a>
+              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-muted hover:text-foreground hover:bg-subtle">Features</a>
+              <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-muted hover:text-foreground hover:bg-subtle">Pricing</a>
             </div>
-            <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="pt-4 pb-3 border-t border-border">
                 <div className="px-5">
-                    <a href="#" className="block w-full text-center px-4 py-2 text-base font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900">Sign up</a>
-                    <p className="mt-4 text-center text-base font-medium text-gray-500">
-                        Existing customer? <a href="#" className="text-indigo-600 hover:text-indigo-500">Log in</a>
+                    <a href="#" className="block w-full text-center px-4 py-2 text-base font-medium text-background bg-foreground rounded-lg hover:bg-gray-800">Sign up</a>
+                    <p className="mt-4 text-center text-base font-medium text-muted">
+                        Existing customer? <a href="#" className="text-accent hover:underline">Log in</a>
                     </p>
                 </div>
             </div>
@@ -97,24 +91,24 @@ const Landing = ({
 
       <main>
         {/* Hero Section */}
-        <section className="relative pt-16 sm:pt-24 lg:pt-32">
-          <div className="max-w-2xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-gray-900">
+        <section className="relative pt-20 sm:pt-28 lg:pt-32">
+          <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tighter text-foreground">
               Your notes, but smarter
             </h1>
-            <p className="mt-6 text-lg text-gray-600 max-w-xl mx-auto">
+            <p className="mt-6 text-lg text-muted max-w-2xl mx-auto">
               Capture your thoughts, and let our AI organize, summarize, and connect them for you.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
               <a
                 href={macCtaLink}
-                className="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg text-white bg-accent hover:bg-blue-600 shadow-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 Get for Mac
               </a>
               <a
                 href={windowsCtaLink}
-                className="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-lg text-white bg-gray-800 hover:bg-gray-900 shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800"
+                className="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-border text-base font-semibold rounded-lg text-foreground bg-background hover:bg-subtle shadow-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
               >
                 Get for Windows
               </a>
@@ -123,31 +117,33 @@ const Landing = ({
 
           {/* Floating Keyboard Badges */}
           <div className="hidden lg:block">
-            <KeyBadge className="top-10 left-1/4 -translate-x-20 transition-transform hover:-translate-y-1">⌘ + K</KeyBadge>
-            <KeyBadge className="top-1/2 right-1/4 translate-x-24 transition-transform hover:-translate-y-1">✨ Ask AI</KeyBadge>
-            <KeyBadge className="bottom-0 left-1/4 translate-x-12 transition-transform hover:-translate-y-1">Summarize</KeyBadge>
-            <KeyBadge className="top-20 right-[15%] transition-transform hover:-translate-y-1">Ctrl + S</KeyBadge>
+            <KeyBadge className="top-10 left-1/4 -translate-x-20">⌘ + K</KeyBadge>
+            <KeyBadge className="top-1/2 right-1/4 translate-x-24 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-accent" /> Ask AI
+            </KeyBadge>
+            <KeyBadge className="bottom-0 left-1/4 translate-x-12">Summarize</KeyBadge>
+            <KeyBadge className="top-20 right-[15%]">Ctrl + S</KeyBadge>
           </div>
         </section>
 
-        {/* Frosted Glass Context Card */}
-        <section className="mt-16 sm:mt-24 lg:mt-32 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative p-8 sm:p-12 rounded-2xl bg-white/50 backdrop-blur-xl shadow-2xl ring-1 ring-black/5">
-              <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+        {/* Context Card */}
+        <section className="mt-20 sm:mt-28 lg:mt-32 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative p-8 sm:p-12 rounded-2xl bg-subtle border border-border">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                 What if your notes could think?
               </h2>
-              <p className="mt-4 text-lg text-gray-600">
+              <p className="mt-4 text-lg text-muted">
                 Our app doesn't just store your notes. It understands them. Instantly find related ideas, get answers from your knowledge base, and even search the web in real-time, all within your notes.
               </p>
           </div>
         </section>
 
         {/* Feature Band */}
-        <section className="mt-16 sm:mt-24 lg:mt-32 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+        <section className="mt-20 sm:mt-28 lg:mt-32 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 className="text-2xl sm:text-3xl font-semibold text-foreground">
               Thinking is the most tiring job. Let AI do it for you instead.
             </h3>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
               <FeatureChip>Live notetaking</FeatureChip>
               <FeatureChip>Instant answers</FeatureChip>
               <FeatureChip>Real-time web search</FeatureChip>
@@ -155,22 +151,22 @@ const Landing = ({
         </section>
 
         {/* Product Demo */}
-        <section className="mt-16 sm:mt-24 lg:mt-32 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative rounded-t-xl bg-gray-200/50 p-2 ring-1 ring-inset ring-gray-900/10">
+        <section className="mt-20 sm:mt-28 lg:mt-32 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-xl bg-subtle p-2 ring-1 ring-inset ring-border">
             {/* Mockup Browser Controls */}
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-400"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-              <div className="w-3 h-3 rounded-full bg-green-400"></div>
+              <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+              <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+              <div className="w-3 h-3 rounded-full bg-gray-300"></div>
             </div>
             {/* Demo Image and Overlays */}
-            <div className="relative mt-2 rounded-t-lg border border-gray-200/80 shadow-inner">
+            <div className="relative mt-2 rounded-lg border border-border">
               <img
                 src={demoSrc}
                 alt="Product demo screenshot"
-                className="rounded-t-lg"
+                className="rounded-lg"
               />
-               <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/10 rounded-t-lg">
+               <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 bg-black/10 rounded-lg">
                     {/* Overlay chips on hover */}
                     <DemoChip className="transform -translate-x-24 -translate-y-12">AI response</DemoChip>
                     <DemoChip className="transform translate-x-20 translate-y-16">Show transcript</DemoChip>
@@ -180,8 +176,8 @@ const Landing = ({
         </section>
       </main>
 
-      <footer className="mt-16 sm:mt-24 lg:mt-32 py-12 bg-gray-50/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500">
+      <footer className="mt-20 sm:mt-28 lg:mt-32 py-12 bg-subtle border-t border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted">
             <p>&copy; {new Date().getFullYear()} Your Company, Inc. All rights reserved.</p>
         </div>
       </footer>

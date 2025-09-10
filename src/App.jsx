@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import MainLayout from './components/Layout/MainLayout';
+import Landing from './Landing'; // Import the Landing component
 import ChatInterface from './components/Chatbot/ChatInterface';
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const FAQListPage = lazy(() => import('./pages/FAQListPage'));
@@ -32,7 +33,7 @@ const router = createBrowserRouter([
     children: [
       { 
         index: true,
-        element: <ChatInterface />
+        element: <Landing />
       },
       {
         path: "about-us",
