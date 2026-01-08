@@ -231,6 +231,13 @@ export default function Header() {
               >
                 FAQ & Guides
               </Link>
+              <Link
+                to="/merchandise"
+                className={`nav-link py-2 px-1 md:px-2 rounded-lg block transition-colors duration-150 ${isActive('/merchandise') ? 'nav-link-active bg-gray-100' : ''}`}
+                onClick={closeAllDropdowns} // Close all
+              >
+                Merchandise
+              </Link>
 
               {/* Language Dropdown */}
               <div className="relative py-2 md:py-0" ref={langDropdownRef}>

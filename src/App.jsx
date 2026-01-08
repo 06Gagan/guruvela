@@ -15,6 +15,7 @@ const HowToUsePage = lazy(() => import('./pages/HowToUsePage'));
 const AboutUsPage = lazy(() => import('./pages/AboutUsPage'));
 const JosaaDocumentsPage = lazy(() => import('./pages/JosaaDocumentsPage'));
 const PreferenceGuidesPage = lazy(() => import('./pages/PreferenceGuidesPage'));
+const MerchandisePage = lazy(() => import('./pages/MerchandisePage'));
 import { LanguageProvider } from './contexts/LanguageContext';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react"; // Import Vercel Analytics
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
       {
         path: "mentors",
         element: withSuspense(MentorsPage)
+      },
+      {
+        path: "merchandise",
+        element: withSuspense(MerchandisePage)
       }
     ]
   }
