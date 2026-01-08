@@ -32,7 +32,7 @@ export async function getGenerativeResponse(prompt, language = 'en') {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       generationConfig: {
         maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
       },
@@ -45,7 +45,7 @@ export async function getGenerativeResponse(prompt, language = 'en') {
     };
     const targetLanguage = languageMap[language] || 'English';
 
-    const fullPrompt = `You are a helpful assistant for a college counseling website called Guruvela. Answer the following user query concisely (in about 2-3 sentences) in ${targetLanguage}. Do not use Markdown. User query: "${prompt}"`;
+    const fullPrompt = `You are a helpful assistant for a college counseling website called Guruvela. Answer the following user query very concisely (in 1-2 short sentences) in ${targetLanguage}. Do not use Markdown. User query: "${prompt}"`;
 
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;

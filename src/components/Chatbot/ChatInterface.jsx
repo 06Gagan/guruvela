@@ -309,10 +309,18 @@ export default function ChatInterface() {
         resetPending();
       }
     } else {
-      if (isGeminiConfigured) {
+      // Check if the message corresponds to one of the custom categories (suggestions)
+      const isCustomCategory = currentCategories.some(cat => cat.exampleQuery === currentMessageText);
+
+      if (isCustomCategory) {
+        // If it's a custom category, use the fixed response logic (Supabase)
+        response = await findBestResponse(currentMessageText, language);
+      } else if (isGeminiConfigured) {
+        // If it's a general question and Gemini is configured, use Gemini
         const geminiResponse = await getGenerativeResponse(currentMessageText, language);
         response = { content: geminiResponse, relatedContent: null, showHowToUseSuggestion: false };
       } else {
+        // Fallback if not a custom category and Gemini is not configured
         response = await findBestResponse(currentMessageText, language);
       }
       resetPending();
