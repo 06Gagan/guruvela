@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ChatInterface from './components/Chatbot/ChatInterface';
 
 const features = [
   {
@@ -78,30 +79,99 @@ const FeatureCard = ({ feature, index }) => {
 };
 
 export default function Landing() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Calculate Opacity/Scale based on scroll for Hero Transition
+  // 0 to 400px scroll: Fade out Title, Fade in Chat
+  const scrollThreshold = 400;
+  const progress = Math.min(scrollY / scrollThreshold, 1);
+
+  const titleOpacity = 1 - progress;
+  const titleScale = 1 - (progress * 0.2); // Scale down slightly
+  const titleTranslateY = -progress * 100; // Move up
+
+  // Chat Interface Transition
+  // Starts appearing after 100px, fully visible by 400px
+  const chatOpacity = Math.max(0, (scrollY - 100) / 300);
+  const chatScale = 0.8 + (Math.min(1, Math.max(0, (scrollY - 100) / 300)) * 0.2); // Scale up from 0.8 to 1
+  const chatTranslateY = 100 - (Math.min(1, Math.max(0, (scrollY - 100) / 300)) * 100); // Slide up
+
+  // Should we allow pointer events on chat? Only when it's mostly visible
+  const chatPointerEvents = progress > 0.8 ? 'auto' : 'none';
+
   return (
     <div className="w-full">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary via-blue-500 to-white overflow-hidden pt-16">
-        <div className="absolute inset-0 pointer-events-none">
-           {/* Abstract minimalist vertical lines or slight texture could go here if needed */}
-        </div>
+      {/*
+        HERO + CHAT TRANSITION SECTION
+        Pinned height to allow for scroll effect
+      */}
+      <section className="relative h-[160vh] bg-gradient-to-b from-primary via-blue-500 to-white overflow-visible">
 
-        <div className="z-10 text-center px-4 animate-fade-in-up">
-          <h1 className="font-display text-[20vw] sm:text-[15vw] leading-none font-bold text-white tracking-tighter drop-shadow-sm opacity-90 select-none transform hover:scale-105 transition-transform duration-700 ease-out">
-            GURUVELA
-          </h1>
-          <p className="mt-4 text-xl sm:text-2xl md:text-3xl text-blue-50 font-medium tracking-wide max-w-3xl mx-auto">
-            Your Official Companion for Engineering Admissions
-          </p>
-          <div className="mt-10">
-             <span className="text-white/80 text-sm uppercase tracking-widest">Scroll to explore</span>
-             <div className="mt-2 w-px h-16 bg-white/50 mx-auto animate-bounce"></div>
+        {/* Fixed Background Elements */}
+        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+
+          {/* TITLE LAYER */}
+          <div
+            className="absolute z-10 text-center px-4 transition-transform duration-100 ease-out will-change-transform"
+            style={{
+              opacity: titleOpacity,
+              transform: `translateY(${titleTranslateY}px) scale(${titleScale})`,
+              pointerEvents: titleOpacity > 0.1 ? 'auto' : 'none'
+            }}
+          >
+            <h1 className="font-display text-[20vw] sm:text-[15vw] leading-none font-bold text-white tracking-tighter drop-shadow-sm select-none">
+              GURUVELA
+            </h1>
+            <p className="mt-4 text-xl sm:text-2xl md:text-3xl text-blue-50 font-medium tracking-wide max-w-3xl mx-auto">
+              Your Official Companion for Engineering Admissions
+            </p>
+            <div className="mt-10 animate-bounce">
+               <span className="text-white/80 text-sm uppercase tracking-widest block mb-2">Scroll to Chat</span>
+               <svg className="w-6 h-6 text-white mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
           </div>
+
+          {/* CHAT LAYER */}
+          <div
+            className="absolute z-20 w-full max-w-5xl px-4 transition-all duration-300 ease-out will-change-transform"
+            style={{
+              opacity: chatOpacity,
+              transform: `translateY(${chatTranslateY}px) scale(${chatScale})`,
+              pointerEvents: chatPointerEvents
+            }}
+          >
+            <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 overflow-hidden h-[70vh] md:h-[80vh] flex flex-col relative">
+              {/* Fake Browser Header for "Official" Look */}
+              <div className="bg-gray-100 border-b border-gray-200 px-4 py-3 flex items-center space-x-2">
+                <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                <div className="ml-4 flex-grow bg-white rounded-md h-6 border border-gray-200 flex items-center px-3 text-xs text-gray-400">
+                  guruvela.com/assistant
+                </div>
+              </div>
+
+              {/* Chat Interface Container */}
+              <div className="flex-grow overflow-hidden relative p-2 md:p-4">
+                 <ChatInterface />
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
       {/* Stacking Cards Section */}
-      <section className="relative w-full bg-gray-50 pb-20">
+      <section className="relative w-full bg-gray-50 pb-20 z-30">
+        <div className="py-20 text-center">
+            <h2 className="text-3xl font-bold text-gray-400 uppercase tracking-widest">More Features</h2>
+        </div>
         {features.map((feature, index) => (
           <FeatureCard key={index} feature={feature} index={index} />
         ))}

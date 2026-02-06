@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import ChatInterface from './ChatInterface';
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const widgetRef = useRef(null);
+  const location = useLocation();
+
+  // Hide widget on the home page ('/') because the chat is embedded there
+  const isHomePage = location.pathname === '/';
 
   const toggleOpen = () => setIsOpen(prev => !prev);
 
@@ -19,6 +24,8 @@ export default function ChatWidget() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  if (isHomePage) return null;
+
   return (
     <>
       {/* Widget Container */}
@@ -33,7 +40,7 @@ export default function ChatWidget() {
           bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col
         `}
       >
-        {/* Header (Optional, if we want a drag handle or specific close button separate from the FAB) */}
+        {/* Header (Mobile Only Close Button) */}
         <div className="bg-primary px-4 py-3 flex items-center justify-between text-white sm:hidden">
             <span className="font-bold">Guruvela Assistant</span>
             <button onClick={() => setIsOpen(false)} className="text-white hover:text-gray-200">
