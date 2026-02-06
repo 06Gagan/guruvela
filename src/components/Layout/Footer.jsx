@@ -1,25 +1,55 @@
 // src/components/Layout/Footer.jsx
-import { Link } from 'react-router-dom'; // Import Link
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="mt-12 bg-white/70 backdrop-blur-md border-t border-accent/20 text-gray-800">
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <p className="font-semibold text-lg mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Guruvela</p>
-          <p className="text-sm mb-4 text-gray-600">
-            Your trusted guide for JOSAA, CSAB, and all things related to engineering admissions in India.
-          </p>
-          <div className="flex justify-center space-x-4 mb-4 text-sm">
-            <Link to="/about-us" className="text-gray-700 hover:text-accent transition-colors">About Us</Link>
-            <Link to="/faqs" className="text-gray-700 hover:text-accent transition-colors">FAQ & Guides</Link>
-            {/* Placeholder Links - replace '#' with actual paths when ready */}
-            <Link to="#" className="text-gray-700 hover:text-accent transition-colors">Privacy Policy</Link>
-            <Link to="#" className="text-gray-700 hover:text-accent transition-colors">Terms of Service</Link>
+    <footer className="mt-auto bg-gray-50 border-t border-gray-200 text-gray-700">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand Column */}
+          <div className="md:col-span-1">
+            <Link to="/" className="text-xl font-black text-primary tracking-tight mb-4 block">
+              Guruvela
+            </Link>
+            <p className="text-sm text-gray-500 mb-4">
+              Your trusted guide for JoSAA, CSAB, and engineering admissions in India. Official, authentic, and student-focused.
+            </p>
           </div>
-          <p className="text-xs text-gray-500">
-            © {new Date().getFullYear()} Guruvela. All rights reserved.
-          </p>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Quick Links</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/rank-predictor" className="hover:text-primary transition-colors">College Predictor</Link></li>
+              <li><Link to="/josaa-documents" className="hover:text-primary transition-colors">Document Verification</Link></li>
+              <li><Link to="/preference-guides" className="hover:text-primary transition-colors">Preference Guides</Link></li>
+              <li><Link to="/merchandise" className="hover:text-primary transition-colors">Merchandise</Link></li>
+            </ul>
+          </div>
+
+          {/* Resources */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Resources</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/faqs" className="hover:text-primary transition-colors">FAQs & Guides</Link></li>
+              <li><Link to="/how-to-use" className="hover:text-primary transition-colors">How to Use</Link></li>
+              <li><Link to="/mentors" className="hover:text-primary transition-colors">Mentors</Link></li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h3 className="font-bold text-gray-900 mb-4">Company</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/about-us" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link to="#" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="#" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200 mt-8 pt-8 text-center text-xs text-gray-500">
+          <p>© {new Date().getFullYear()} Guruvela. All rights reserved.</p>
         </div>
       </div>
     </footer>

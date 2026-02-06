@@ -44,23 +44,23 @@ const MerchandisePage = () => {
   ];
 
   const ProductCard = ({ product }) => (
-    <div className="card flex flex-col items-center text-center p-6 transform transition-all duration-300 hover:shadow-xl hover:scale-105 h-full bg-white rounded-lg border border-gray-100">
-      <div className="w-full aspect-square overflow-hidden rounded-md mb-4 bg-gray-100 flex items-center justify-center">
+    <div className="flex flex-col items-center text-center p-6 h-full bg-white rounded-lg border border-gray-200 shadow-sm transition-shadow duration-300 hover:shadow-md">
+      <div className="w-full aspect-square overflow-hidden rounded-md mb-4 bg-gray-50 flex items-center justify-center border border-gray-100">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
           loading="lazy"
         />
       </div>
-      <h3 className="text-xl font-bold text-gray-800 mb-2">{product.name}</h3>
-      <p className="text-gray-600 text-sm mb-4 flex-grow">{product.description}</p>
+      <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+      <p className="text-gray-600 text-sm mb-6 flex-grow leading-relaxed">{product.description}</p>
 
       <a
         href={GOOGLE_FORM_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn-primary w-full block py-2 rounded-md font-semibold text-white transition-colors"
+        className="w-full block py-2.5 rounded-md font-semibold text-white bg-primary hover:bg-primary-dark transition-colors shadow-sm"
         onClick={(e) => {
             if (GOOGLE_FORM_LINK === '#') {
                 e.preventDefault();
@@ -68,34 +68,37 @@ const MerchandisePage = () => {
             }
         }}
       >
-        If interested register here
+        Register Interest
       </a>
     </div>
   );
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-start mb-6">
-        <Link to="/" className="text-primary hover:underline font-medium">&larr; Back to Home</Link>
+      <div className="flex justify-start mb-8">
+        <Link to="/" className="text-gray-500 hover:text-primary font-medium flex items-center transition-colors">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Home
+        </Link>
       </div>
 
-      <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-4">
-          Merchandise Store
+      <div className="text-center mb-16">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+          Official Merchandise
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Grab your exclusive IIT Mandi apparel. Whether you are a student or an aspirant, we have something for you!
+          Exclusive apparel for the IIT Mandi community and aspirants. High-quality, authentic gear.
         </p>
       </div>
 
       {/* IIT Students Section */}
-      <section className="mb-16">
-        <div className="flex items-center mb-8">
-          <div className="flex-grow h-px bg-gray-200"></div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 px-6">For IIT Mandi Students</h2>
-          <div className="flex-grow h-px bg-gray-200"></div>
+      <section className="mb-20">
+        <div className="flex items-center mb-10">
+          <div className="h-px bg-gray-200 flex-grow"></div>
+          <h2 className="text-2xl font-bold text-gray-800 px-6 uppercase tracking-wide">For IIT Mandi Students</h2>
+          <div className="h-px bg-gray-200 flex-grow"></div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center">
           {iitProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -103,21 +106,21 @@ const MerchandisePage = () => {
       </section>
 
       {/* Non-IITians Section */}
-      <section>
-        <div className="flex items-center mb-8">
-          <div className="flex-grow h-px bg-gray-200"></div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 px-6">For Non-IITians</h2>
-          <div className="flex-grow h-px bg-gray-200"></div>
+      <section className="mb-12">
+        <div className="flex items-center mb-10">
+          <div className="h-px bg-gray-200 flex-grow"></div>
+          <h2 className="text-2xl font-bold text-gray-800 px-6 uppercase tracking-wide">For Aspirants & Fans</h2>
+          <div className="h-px bg-gray-200 flex-grow"></div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center">
           {nonIitProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      <div className="mt-16 text-center text-gray-500 text-sm">
-        <p>Disclaimer: Designs shown are for illustration purposes only. Final product may vary.</p>
+      <div className="mt-16 text-center border-t border-gray-100 pt-8">
+        <p className="text-gray-400 text-sm">Disclaimer: Product images are for illustration only. Actual designs may vary.</p>
       </div>
     </div>
   );

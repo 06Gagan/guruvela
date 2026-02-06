@@ -364,28 +364,28 @@ export default function ChatInterface() {
 
   return (
     // Make this outer div a flex container that grows to fill available vertical space
-    <div className="max-w-4xl mx-auto flex-grow flex flex-col">
-      <div className="flex justify-end mb-4">
-        <button onClick={handleResetConversation} className="btn-outline text-sm">Reset Conversation</button>
+    <div className="w-full h-full flex flex-col p-2">
+      <div className="flex justify-end mb-2">
+        <button onClick={handleResetConversation} className="text-xs text-gray-500 hover:text-primary underline">Reset Chat</button>
       </div>
       {showPredictorPromo && (
-        <div className="relative bg-gray-100 border border-gray-200 p-3 sm:p-4 mb-4 rounded-lg shadow flex flex-col sm:flex-row items-center justify-between text-center sm:text-left">
-          <p className="text-sm sm:text-base text-gray-700 mb-2 sm:mb-0 sm:mr-4">
+        <div className="relative bg-blue-50 border border-blue-100 p-2 mb-2 rounded-lg flex flex-col items-center text-center">
+          <p className="text-xs text-gray-700 mb-2">
             {currentUiText.predictorPopupText}
           </p>
           <Link
             to="/rank-predictor"
-            className="btn-primary py-1.5 px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap"
+            className="btn-primary py-1 px-3 text-xs whitespace-nowrap"
             onClick={handleClosePredictorPromo}
           >
             {currentUiText.goToPredictorButton}
           </Link>
           <button
             onClick={handleClosePredictorPromo}
-            className="absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-600 sm:static sm:ml-2"
+            className="absolute top-1 right-1 p-1 text-gray-400 hover:text-gray-600"
             aria-label="Close predictor promotion"
           >
-            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
@@ -394,11 +394,10 @@ export default function ChatInterface() {
 
       {/* Make the card grow to fill space from parent (flex-1), 
         remain a flex column, and hide its own overflow.
-        Remove fixed height h-[calc(100vh-200px)] sm:h-[600px]
       */}
-      <div className="card flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-lg border border-gray-100 shadow-inner">
         <div
-          className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+          className="flex-grow overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
           role="log"
           aria-label="Chat messages"
           aria-live="polite"
@@ -483,22 +482,22 @@ export default function ChatInterface() {
           <div ref={chatEndRef} />
         </div>
 
-        <div className="border-t border-gray-200 p-4 bg-white">
+        <div className="border-t border-gray-200 p-2 bg-white">
           {/* Form area, fixed height */}
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+          <form onSubmit={handleSubmit} className="flex gap-2">
             <input
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={currentUiText.askPlaceholder}
-              className="flex-grow form-input w-full"
+              className="flex-grow form-input w-full text-sm"
               disabled={isLoading}
               aria-label="Type your message"
             />
             <button
               type="submit"
               disabled={!message.trim() || isLoading}
-              className={`btn-primary flex items-center gap-2 justify-center w-full sm:w-auto sm:min-w-[100px]
+              className={`btn-primary flex items-center justify-center p-2 rounded-lg
                 ${(!message.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
               aria-label={isLoading ? "Sending message..." : "Send message"}
             >
