@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import MainLayout from './components/Layout/MainLayout';
-import ChatInterface from './components/Chatbot/ChatInterface';
+import Landing from './Landing'; // Import the new Landing page
 const ContentPage = lazy(() => import('./pages/ContentPage'));
 const FAQListPage = lazy(() => import('./pages/FAQListPage'));
 const RankPredictorPage = lazy(() => import('./pages/RankPredictorPage'));
@@ -18,10 +18,10 @@ const PreferenceGuidesPage = lazy(() => import('./pages/PreferenceGuidesPage'));
 const MerchandisePage = lazy(() => import('./pages/MerchandisePage'));
 import { LanguageProvider } from './contexts/LanguageContext';
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { Analytics } from "@vercel/analytics/react"; // Import Vercel Analytics
+import { Analytics } from "@vercel/analytics/react";
 
 const withSuspense = (Component) => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<div className="flex h-screen items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div></div>}>
     <Component />
   </Suspense>
 );
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
     children: [
       { 
         index: true,
-        element: <ChatInterface />
+        element: <Landing />
       },
       {
         path: "about-us",
@@ -84,7 +84,7 @@ function App() {
     <LanguageProvider>
       <RouterProvider router={router} />
       <SpeedInsights />
-      <Analytics /> {/* Add the Analytics component here */}
+      <Analytics />
     </LanguageProvider>
   );
 }
