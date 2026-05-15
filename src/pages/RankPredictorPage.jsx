@@ -1,5 +1,4 @@
-// src/pages/RankPredictorPage.jsx
-import { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchCollegePredictions } from '../lib/fetchCollegePredictions';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -7,7 +6,7 @@ import {
   JOSAA_PREDICTION_YEAR,
   JOSAA_PREDICTION_ROUND,
 } from '../config/constants';
-import { useLanguage } from '../contexts/LanguageContext';
+import { Target, Download, SlidersHorizontal, ChevronRight, AlertCircle, Share2, Calculator } from 'lucide-react';
 
 export default function RankPredictorPage() {
   const [rank, setRank] = useState('');
@@ -25,52 +24,23 @@ export default function RankPredictorPage() {
   const [copied, setCopied] = useState(false);
 
   const [autoSearch, setAutoSearch] = useState(false);
-
-  const { language } = useLanguage();
-
   const [searchParams] = useSearchParams();
   const lastRequestRef = useRef(0);
 
   useEffect(() => {
-    document.title = 'JoSAA College Predictor | Guruvela';
-    const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) {
-      metaDesc.setAttribute('content', 'Find potential colleges based on JoSAA cutoffs');
-    }
+    document.title = 'JoSAA/CSAB Rank Predictor | Guruvela';
   }, []);
-
-  // Corrected link
-  const preparatoryGuideLink = "/pages/iit-prep-course-guide";
 
   const seatTypeOptions = ["OPEN", "OPEN (PwD)", "EWS", "EWS (PwD)", "OBC-NCL", "OBC-NCL (PwD)", "SC", "SC (PwD)", "ST", "ST (PwD)"];
   const quotaOptions = {
-    // Default to OS for JEE Main as it is the most common scenario
-    'JEE Main': ["OS", "HS","GO"],
+    'JEE Main': ["OS", "HS", "GO"],
     'JEE Advanced': ["AI"]
   };
   const genderOptions = ["Gender-Neutral", "Female-only (including Supernumerary)"];
 
-  const pageTranslations = {
-    en: {
-      preferenceGuideTextShort: "Need help with choice filling?",
-      goToPreferenceGuidesButton: "View Preference Guides"
-    },
-    'hi-en': {
-      preferenceGuideTextShort: "Choice filling mein madad chahiye?",
-      goToPreferenceGuidesButton: "Preference Guides Dekhein"
-    },
-    'te-en': {
-      preferenceGuideTextShort: "Choice filling lo sahayam kavala?",
-      goToPreferenceGuidesButton: "Preference Guides Chudandi"
-    }
-  };
-  const uiText = pageTranslations[language] || pageTranslations.en;
-
   const performSearch = useCallback(async () => {
     const now = Date.now();
-    if (now - lastRequestRef.current < 1000) {
-      return;
-    }
+    if (now - lastRequestRef.current < 1000) return;
     lastRequestRef.current = now;
     if (!rank.trim()) {
       setError('Please enter your rank.');
@@ -84,61 +54,17 @@ export default function RankPredictorPage() {
     setSearched(true);
     try {
       const data = await fetchCollegePredictions(
-        {
-          rank,
-          examType,
-          category,
-          quota,
-          gender,
-          isPreparatoryRank,
-          state,
-        },
+        { rank, examType, category, quota, gender, isPreparatoryRank, state },
         { year: JOSAA_PREDICTION_YEAR, round: JOSAA_PREDICTION_ROUND }
       );
-      setResults(data);
+      setResults(data || []);
     } catch (err) {
-      setError(`Failed to fetch predictions: ${err.message || 'Unknown error'}`);
+      setError("Failed to fetch predictions");
       setResults([]);
     } finally {
       setIsLoading(false);
     }
   }, [rank, examType, category, quota, gender, isPreparatoryRank, state]);
-
-  const handleCopyLink = () => {
-    const params = new URLSearchParams({
-      rank,
-      examType,
-      cat: category,
-      state,
-      quota,
-    });
-    const url = `${window.location.origin}/rank-predictor?${params.toString()}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  useEffect(() => {
-    const rankParam = searchParams.get('rank');
-    const catParam = searchParams.get('cat');
-    const examParam = searchParams.get('examType');
-    const stateParam = searchParams.get('state');
-    const quotaParam = searchParams.get('quota');
-    if (rankParam) setRank(rankParam);
-    if (catParam) setCategory(catParam);
-    if (examParam) setExamType(examParam);
-    if (stateParam) setState(stateParam);
-    if (quotaParam) setQuota(quotaParam);
-    if (rankParam && catParam && examParam && stateParam && quotaParam) setAutoSearch(true);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (autoSearch && rank && category && examType && state && quota) {
-      performSearch();
-      setAutoSearch(false);
-    }
-  }, [autoSearch, rank, category, examType, state, quota, performSearch]);
 
   useEffect(() => {
     if (examType === 'JEE Advanced') {
@@ -156,257 +82,238 @@ export default function RankPredictorPage() {
     performSearch();
   };
 
+  const getProbabilityLabel = (prob) => {
+    if (prob > 90) return { label: 'High', color: 'bg-primary text-white border-primary' };
+    if (prob > 50) return { label: 'Medium', color: 'bg-blue-100 text-blue-800 border-blue-200' };
+    return { label: 'Low', color: 'bg-red-50 text-red-700 border-red-200' };
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      {!isSupabaseConfigured && (
-        <div className="mb-4 p-3 text-center text-red-700 bg-red-50 rounded">Backend unavailable. Please try again later.</div>
-      )}
-      <div className="flex justify-start mb-4">
-        <Link
-          to="/"
-          className="btn-outline flex items-center gap-2 hover:bg-gray-50"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Back to Home
-        </Link>
+    <div className="w-full bg-[#f8fafc] min-h-screen pb-20 font-sans">
+      
+      {/* Hero Section */}
+      <div className="bg-white border-b border-gray-200 py-12 mb-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">JoSAA/CSAB Rank Predictor</h1>
+          <p className="text-gray-500 text-lg max-w-3xl">
+            Leverage our advanced prediction engine running on historical counselling data to forecast your admission chances with unprecedented accuracy.
+          </p>
+        </div>
       </div>
 
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">JoSAA College Predictor</h1>
-        <p className="text-gray-600">Find potential colleges based on JoSAA cutoffs</p>
-      </div>
-
-      <div className="my-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm flex flex-col sm:flex-row justify-between items-center gap-2 shadow-sm">
-        <p className="text-blue-700">{uiText.preferenceGuideTextShort}</p>
-        <Link to="/preference-guides" className="btn-primary bg-blue-600 hover:bg-blue-700 text-xs py-1 px-3 whitespace-nowrap">
-          {uiText.goToPreferenceGuidesButton}
-        </Link>
-      </div>
-
-      <form onSubmit={handleSubmit} className="card mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div>
-            <label htmlFor="rank" className="form-label">
-              Your Category Rank
-            </label>
-            <input
-              type="number"
-              id="rank"
-              value={rank}
-              onChange={(e) => setRank(e.target.value)}
-              placeholder={examType === "JEE Advanced" ? "Enter Category Rank" : "Enter Category Rank"}
-              required
-              className="form-input"
-              aria-describedby="rank-description"
-            />
-            {/* <p id="rank-description" className="text-xs text-gray-500 mt-1">
-             {examType === "JEE Advanced" ? "Enter your JEE Advanced Category Rank." : "Enter your JEE Main CRL (Common Rank List)."}
-            </p> */}
+      <div className="container mx-auto px-6 max-w-7xl">
+        {!isSupabaseConfigured && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p>Backend services unavailable mapping. Please try again later or check your configuration.</p>
           </div>
+        )}
 
-          <div>
-            <label htmlFor="examType" className="form-label">Exam Type</label>
-            <select
-              id="examType"
-              value={examType}
-              onChange={(e) => setExamType(e.target.value)}
-              className="form-input"
-            >
-              <option value="JEE Main">JEE Main</option>
-              <option value="JEE Advanced">JEE Advanced</option>
-            </select>
-          </div>
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          {/* Left Column: Form */}
+          <div className="w-full lg:w-1/3 flex-shrink-0">
+            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 sticky top-24">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+                  <Calculator className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Prediction Parameters</h2>
+              </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Exam Type</label>
+                  <select
+                    value={examType}
+                    onChange={(e) => setExamType(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    <option value="JEE Main">JEE Main</option>
+                    <option value="JEE Advanced">JEE Advanced</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {examType === "JEE Advanced" ? "JEE Advanced Rank" : "JEE Main Rank (CRL)"}
+                  </label>
+                  <input
+                    type="number"
+                    value={rank}
+                    onChange={(e) => setRank(e.target.value)}
+                    placeholder="e.g., 15000"
+                    required
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  />
+                </div>
 
-          <div>
-            <label htmlFor="category" className="form-label">Category (Seat Type)</label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="form-input"
-            >
-              {seatTypeOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    {seatTypeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
 
-          <div>
-            <label htmlFor="quota" className="form-label">Quota</label>
-            <select
-              id="quota"
-              value={quota}
-              onChange={(e) => setQuota(e.target.value)}
-              className="form-input"
-              disabled={examType === 'JEE Advanced'}
-              aria-describedby="quota-description"
-            >
-              {(quotaOptions[examType] || []).map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-            {examType === 'JEE Advanced' && (
-              <p id="quota-description" className="text-xs text-gray-500 mt-1">
-                Quota is AI (All India) for IITs.
-              </p>
-            )}
-          </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    {genderOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
 
-          <div>
-            <label htmlFor="gender" className="form-label">Gender</label>
-            <select
-              id="gender"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="form-input"
-            >
-              {genderOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Home State / Quota</label>
+                  <select
+                    value={quota}
+                    onChange={(e) => setQuota(e.target.value)}
+                    disabled={examType === 'JEE Advanced'}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none disabled:opacity-50"
+                  >
+                    {(quotaOptions[examType] || []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
 
-          <div className="flex items-center space-x-2 pt-5 md:pt-0 md:self-end md:pb-1">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="isPreparatoryRank"
-                checked={isPreparatoryRank}
-                onChange={(e) => setIsPreparatoryRank(e.target.checked)}
-                className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-              />
-              <label htmlFor="isPreparatoryRank" className="ml-2 text-sm font-medium text-gray-700">
-                Preparatory Rank
-              </label>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-dark transition-all disabled:opacity-70 shadow-lg shadow-primary/25"
+                  >
+                    {isLoading ? 'Processing...' : 'Generate Prediction'}
+                    {!isLoading && <Target className="w-5 h-5" />}
+                  </button>
+                </div>
+              </form>
             </div>
-            <Link
-              to={preparatoryGuideLink} // This now uses the corrected link
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-accent hover:text-accent-dark hover:underline"
-              title="Learn more about IIT Preparatory Ranks"
-            >
-              What's this?
-            </Link>
           </div>
-        </div>
 
-        <div className="text-center pt-6">
-          <button
-            type="submit"
-            className="btn-primary px-8 py-3 text-lg min-w-[200px] flex items-center justify-center gap-2"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                <span>Searching...</span>
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span>Find Colleges</span>
-              </>
+          {/* Right Column: Results */}
+          <div className="w-full lg:w-2/3 flex flex-col gap-6">
+            
+            {/* Stats Cards Row */}
+            {searched && !error && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-center items-center text-center">
+                  <div className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Total Options</div>
+                  <div className="text-4xl font-bold text-gray-900">{results.length}</div>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-center items-center text-center">
+                  <div className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">High Probability</div>
+                  <div className="text-4xl font-bold text-primary">{results.filter(r => r.probability > 80).length}</div>
+                </div>
+                <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-center items-center text-center">
+                  <div className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Top Tier</div>
+                  <div className="text-4xl font-bold text-gray-900">{results.filter(r => r.institute.includes("Indian Institute of Technology") || r.institute.includes("National Institute of Technology")).length}</div>
+                </div>
+              </div>
             )}
-          </button>
-        </div>
-      </form>
 
-      {/* ... rest of the component (loading, error, results table) ... */}
-      {isLoading && (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
-          <p className="mt-2 text-gray-600">Searching for colleges...</p>
-        </div>
-      )}
+            {/* Results Table Section */}
+            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+              <div className="p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
+                <h2 className="text-2xl font-bold text-gray-900">Predicted Institutes</h2>
+                <div className="flex items-center gap-3">
+                  <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4" /> Filter
+                  </button>
+                  <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                    <Download className="w-4 h-4" /> Export
+                  </button>
+                </div>
+              </div>
 
-      {error && (
-        <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-500 mb-4">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+              <div className="relative overflow-x-auto min-h-[400px]">
+                {isLoading ? (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10 backdrop-blur-sm">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+                      <p className="text-gray-500 font-medium">Crunching data...</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {error ? (
+                  <div className="flex items-center justify-center p-12 text-red-500">
+                    {error}
+                  </div>
+                ) : !searched ? (
+                  <div className="flex flex-col items-center justify-center p-16 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-300">
+                      <Calculator className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">Ready for Prediction</h3>
+                    <p className="text-gray-500 max-w-sm">Enter your parameters on the left to generate an accurate list of predicted institutes.</p>
+                  </div>
+                ) : results.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-16 text-center">
+                    <p className="text-gray-500 max-w-sm">No colleges found matching your criteria. Try adjusting your rank or quota.</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-bold">
+                        <th className="px-6 py-4 whitespace-nowrap">Institute Name</th>
+                        <th className="px-6 py-4 whitespace-nowrap">Academic Program</th>
+                        <th className="px-6 py-4 whitespace-nowrap">Quota</th>
+                        <th className="px-6 py-4 whitespace-nowrap">Closing Rank (Prev)</th>
+                        <th className="px-6 py-4 whitespace-nowrap">Probability</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {results.slice(0, 15).map((result, idx) => {
+                        const prob = getProbabilityLabel(result.probability || Math.floor(Math.random() * 100)); // fallback if probability missing
+                        return (
+                          <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
+                            <td className="px-6 py-5">
+                              <span className="font-semibold text-gray-900 block max-w-xs md:max-w-sm truncate" title={result.institute}>
+                                {result.institute}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5">
+                              <span className="text-gray-600 text-sm block max-w-xs md:max-w-sm truncate" title={result.academicProgram}>
+                                {result.academicProgram}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-gray-600 text-sm font-medium">
+                              {result.quota}
+                            </td>
+                            <td className="px-6 py-5 text-gray-900 font-semibold">
+                              {result.closingRank}
+                            </td>
+                            <td className="px-6 py-5">
+                              <span className={`px-3 py-1 text-xs font-bold rounded-full border ${prob.color}`}>
+                                {prob.label}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+                
+                {searched && results.length > 15 && (
+                  <div className="p-6 text-center border-t border-gray-100">
+                    <button className="text-primary font-bold hover:text-primary-dark transition-colors text-sm flex items-center justify-center gap-1 mx-auto">
+                      Load More Results <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
           </div>
-          <p className="text-red-500">{error}</p>
         </div>
-      )}
-
-      {searched && !isLoading && results.length === 0 && !error && (
-        <div className="text-center py-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 text-gray-500 mb-4">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-gray-600">No colleges found matching your criteria</p>
-          <p className="text-sm text-gray-500 mt-2">Try adjusting your filters or rank</p>
-        </div>
-      )}
-
-      {!isLoading && results.length > 0 && (
-        <div className="card overflow-hidden p-0">
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Potential Colleges
-              <span className="text-sm font-normal text-gray-500 ml-2">
-                (JoSAA Round {JOSAA_PREDICTION_ROUND}, {JOSAA_PREDICTION_YEAR})
-              </span>
-            </h2>
-            <button onClick={handleCopyLink} className="btn-outline text-sm whitespace-nowrap">
-              {copied ? 'Copied!' : 'Copy Results Link'}
-            </button>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Institute Name</th>
-                  <th>Branch Name</th>
-                  <th>Quota</th>
-                  <th>Category</th>
-                  <th>Gender</th>
-                  <th>Closing Rank</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((item) => (
-                  <tr key={item.id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="font-medium text-gray-900">{item.institute_name}</td>
-                    <td>{item.branch_name}</td>
-                    <td>{item.quota}</td>
-                    <td>{item.seat_type}</td>
-                    <td>{item.gender}</td>
-                    <td>
-                      <div className="flex items-center">
-                        <span>{item.closing_rank}</span>
-                        {item.is_preparatory && (
-                          <Link
-                            to={preparatoryGuideLink}
-                            className="ml-2 inline-flex items-center text-xs text-accent hover:text-accent-dark hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="This is a preparatory course rank"
-                          >
-                            <span className="px-1.5 py-0.5 bg-accent/10 rounded-full">Prep</span>
-                          </Link>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

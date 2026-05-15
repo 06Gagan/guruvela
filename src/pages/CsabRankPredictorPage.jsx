@@ -1,22 +1,29 @@
 // src/pages/CsabRankPredictorPage.jsx
-import { useState } from 'react';
-import { Link } from 'react-router-dom'; 
-import { supabase } from '../lib/supabase';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import {
   CSAB_PREDICTION_YEAR,
   CSAB_PREDICTION_ROUND,
 } from '../config/constants';
+import { Target, Download, SlidersHorizontal, ChevronRight, AlertCircle, Share2, Calculator } from 'lucide-react';
 
 export default function CsabRankPredictorPage() {
   const [rank, setRank] = useState('');
   const [category, setCategory] = useState('OPEN');
-  const [quota, setQuota] = useState('AI');
+  const [quota, setQuota] = useState('OS');
   const [gender, setGender] = useState('Gender-Neutral');
   
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
+
+  const lastRequestRef = useRef(0);
+
+  useEffect(() => {
+    document.title = 'CSAB Rank Predictor | Guruvela';
+  }, []);
 
   const seatTypeOptions = [
     "OPEN", "OPEN (PwD)", 
@@ -26,15 +33,18 @@ export default function CsabRankPredictorPage() {
     "ST", "ST (PwD)"
   ];
 
-  const quotaOptions = [ "OS", "HS", "GO"]; 
+  const quotaOptions = [ "OS", "HS", "GO" ]; 
   
   const genderOptions = [
     "Gender-Neutral",
     "Female-only (including Supernumerary)"
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const performSearch = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastRequestRef.current < 1000) return;
+    lastRequestRef.current = now;
+
     if (!rank.trim()) {
       setError('Please enter your rank.');
       setResults([]);
@@ -86,145 +96,222 @@ export default function CsabRankPredictorPage() {
     } finally {
       setIsLoading(false);
     }
+  }, [rank, category, quota, gender]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    performSearch();
+  };
+
+  const getProbabilityLabel = (closingRank, userRank) => {
+    const diff = closingRank - userRank;
+    if (diff > 5000) return { label: 'High', color: 'bg-primary text-white border-primary' };
+    if (diff > 0) return { label: 'Medium', color: 'bg-blue-100 text-blue-800 border-blue-200' };
+    return { label: 'Low', color: 'bg-red-50 text-red-700 border-red-200' };
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-start mb-4">
-        <Link to="/" className="btn-primary">Back to Home</Link>
-      </div>
-      <h1 className="text-3xl font-bold text-primary mb-8 text-center">
-        Guruvela - CSAB College Predictor
-      </h1>
-      <p className="text-center text-gray-600 mb-6">
-        Find potential colleges based on CSAB Special Round {CSAB_PREDICTION_ROUND} ({CSAB_PREDICTION_YEAR}) cutoffs (JEE Main Ranks).
-      </p>
-
-      {/* Updated to use the .card class from index.css */}
-      <form onSubmit={handleSubmit} className="card mb-8 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
-          <div>
-            <label htmlFor="rank" className="block text-sm font-medium text-gray-700 mb-1">
-              Your JEE Main CRL Rank:
-            </label>
-            <input
-              type="number"
-              id="rank"
-              value={rank}
-              onChange={(e) => setRank(e.target.value)}
-              placeholder="Enter your Common Rank List (CRL)"
-              required
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2"
-            />
-          </div>
-           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Exam Type:
-            </label>
-            <input
-              type="text"
-              value="JEE Main"
-              disabled
-              className="w-full rounded-md border-gray-300 shadow-sm bg-gray-100 p-2"
-            />
-          </div>
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-              Category (Seat Type):
-            </label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2"
-            >
-              {seatTypeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="quota" className="block text-sm font-medium text-gray-700 mb-1">
-              Quota:
-            </label>
-            <select
-              id="quota"
-              value={quota}
-              onChange={(e) => setQuota(e.target.value)}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2"
-            >
-              {quotaOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
-              Gender:
-            </label>
-            <select
-              id="gender"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary p-2"
-            >
-              {genderOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="text-center pt-4">
-          <button 
-            type="submit" 
-            className="btn-primary px-8 py-3 text-lg disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Searching...' : 'Find Colleges (CSAB)'}
-          </button>
-        </div>
-      </form>
-
-      {isLoading && (
-        <div className="flex justify-center items-center my-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      )}
-      {error && <p className="text-center text-red-600 mb-4 p-4 bg-red-100 rounded-md">Error: {error}</p>}
+    <div className="w-full bg-[#f8fafc] min-h-screen pb-20 font-sans">
       
-      {searched && !isLoading && results.length === 0 && !error && (
-        <p className="text-center text-gray-700 my-8 p-4 bg-yellow-100 rounded-md">No colleges found matching your criteria for CSAB Special Round {CSAB_PREDICTION_ROUND} ({CSAB_PREDICTION_YEAR}) based on available data. Your rank might be higher than the cutoffs for these filters, or no data exists for this specific combination.</p>
-      )}
-
-      {!isLoading && results.length > 0 && (
-        <div className="overflow-x-auto shadow-xl rounded-lg">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4 p-4 bg-gray-100 rounded-t-lg">
-            Potential Colleges (CSAB Special Round {results[0]?.round_no}, {results[0]?.year} Data):
-          </h2>
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-200">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Institute Name</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Branch Name</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Quota</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Category (Seat Type)</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Gender</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Closing Rank</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {results.map((item, index) => (
-                <tr key={item.id || index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50 hover:bg-gray-100'}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.institute_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{item.branch_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{item.quota}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{item.seat_type}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{item.gender}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {item.closing_rank}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Hero Section */}
+      <div className="bg-white border-b border-gray-200 py-12 mb-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">CSAB Rank Predictor</h1>
+          <p className="text-gray-500 text-lg max-w-3xl">
+            Leverage our advanced prediction engine running on historical counselling data to forecast your admission chances in CSAB Special Round {CSAB_PREDICTION_ROUND} ({CSAB_PREDICTION_YEAR}).
+          </p>
         </div>
-      )}
+      </div>
+
+      <div className="container mx-auto px-6 max-w-7xl">
+        {!isSupabaseConfigured && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p>Backend services unavailable mapping. Please try again later or check your configuration.</p>
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
+          {/* Left Column: Form */}
+          <div className="w-full lg:w-1/3 flex-shrink-0">
+            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8 sticky top-24">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 text-primary flex items-center justify-center">
+                  <Calculator className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Prediction Parameters</h2>
+              </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Exam Type</label>
+                  <input
+                    type="text"
+                    value="JEE Main"
+                    disabled
+                    className="w-full bg-gray-100 border border-gray-200 text-gray-500 rounded-xl px-4 py-3 cursor-not-allowed outline-none"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">CSAB operates only on JEE Main ranking.</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    JEE Main Rank (CRL)
+                  </label>
+                  <input
+                    type="number"
+                    value={rank}
+                    onChange={(e) => setRank(e.target.value)}
+                    placeholder="e.g., 15000"
+                    required
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Category (Seat Type)</label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    {seatTypeOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    {genderOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Quota</label>
+                  <select
+                    value={quota}
+                    onChange={(e) => setQuota(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors outline-none"
+                  >
+                    {quotaOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                  </select>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-primary text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-dark transition-all disabled:opacity-70 shadow-lg shadow-primary/25"
+                  >
+                    {isLoading ? 'Processing...' : 'Find Colleges (CSAB)'}
+                    {!isLoading && <Target className="w-5 h-5" />}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Right Column: Results */}
+          <div className="w-full lg:w-2/3 flex flex-col gap-6">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-3xl flex items-center gap-4">
+                <AlertCircle className="w-6 h-6 flex-shrink-0" />
+                <p className="font-medium">{error}</p>
+              </div>
+            )}
+
+            {!searched && !isLoading && (
+              <div className="bg-white border text-center border-gray-200 p-12 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
+                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6 text-primary">
+                  <SlidersHorizontal className="w-10 h-10" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to predict your future?</h3>
+                <p className="text-gray-500 max-w-md">
+                  Enter your rank and filters on the left to see which institutes and branches you are likely to get in the CSAB Special Round.
+                </p>
+              </div>
+            )}
+
+            {isLoading && (
+              <div className="bg-white border text-center border-gray-200 p-12 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                <h3 className="text-lg font-medium text-gray-700">Crunching historical CSAB data...</h3>
+              </div>
+            )}
+
+            {searched && !isLoading && results.length === 0 && !error && (
+              <div className="bg-white border text-center border-gray-200 p-12 rounded-3xl flex flex-col items-center justify-center min-h-[400px]">
+                <div className="w-20 h-20 bg-yellow-50 rounded-full flex items-center justify-center mb-6 text-yellow-600">
+                  <AlertCircle className="w-10 h-10" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">No Match Found</h3>
+                <p className="text-gray-500 max-w-md">
+                  We couldn't find any institutes that strictly matched your criteria with current closing ranks data. Your rank might be higher than the cutoffs for these filters.
+                </p>
+              </div>
+            )}
+
+            {searched && !isLoading && results.length > 0 && (
+              <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+                <div className="p-6 md:p-8 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">Predicted Institutes (CSAB)</h3>
+                    <p className="text-gray-500 mt-1">Found {results.length} prospective branches based on CSAB {CSAB_PREDICTION_YEAR}</p>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-white border-b border-gray-100 uppercase text-xs tracking-wider text-gray-500 font-semibold">
+                        <th className="p-6 font-medium">Institute & Branch</th>
+                        <th className="p-6 font-medium">Quota / Type</th>
+                        <th className="p-6 font-medium">Closing Rank</th>
+                        <th className="p-6 font-medium text-right">Probability</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {results.map((item, index) => {
+                        const prob = getProbabilityLabel(item.closing_rank, parseInt(rank));
+                        return (
+                          <tr key={item.id || index} className="hover:bg-gray-50 transition-colors group">
+                            <td className="p-6">
+                              <div className="font-bold text-gray-900 mb-1">{item.institute_name}</div>
+                              <div className="text-sm text-gray-500 flex items-center gap-2">
+                                <span className="bg-gray-100 px-2 py-1 rounded text-xs text-gray-600">{item.branch_name}</span>
+                              </div>
+                            </td>
+                            <td className="p-6">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-sm text-gray-900 font-medium">{item.quota} / {item.seat_type}</span>
+                                <span className="text-xs text-gray-500">{item.gender}</span>
+                              </div>
+                            </td>
+                            <td className="p-6">
+                              <div className="text-lg font-bold text-gray-900">{item.closing_rank}</div>
+                              <div className="text-xs text-gray-400">Opening: {item.opening_rank}</div>
+                            </td>
+                            <td className="p-6 text-right">
+                               <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold border ${prob.color}`}>
+                                {prob.label}
+                               </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
