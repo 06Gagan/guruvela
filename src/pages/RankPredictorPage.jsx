@@ -212,7 +212,7 @@ export default function RankPredictorPage() {
                 </div>
                 <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-center items-center text-center">
                   <div className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Top Tier</div>
-                  <div className="text-4xl font-bold text-gray-900">{results.filter(r => r.institute.includes("Indian Institute of Technology") || r.institute.includes("National Institute of Technology")).length}</div>
+                  <div className="text-4xl font-bold text-gray-900">{results.filter(r => (r.institute_name && (r.institute_name.includes("Indian Institute of Technology") || r.institute_name.includes("National Institute of Technology")))).length}</div>
                 </div>
               </div>
             )}
@@ -274,20 +274,20 @@ export default function RankPredictorPage() {
                         return (
                           <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
                             <td className="px-6 py-5">
-                              <span className="font-semibold text-gray-900 block max-w-xs md:max-w-sm truncate" title={result.institute}>
-                                {result.institute}
+                              <span className="font-semibold text-gray-900 block max-w-xs md:max-w-sm truncate" title={result.institute_name}>
+                                {result.institute_name}
                               </span>
                             </td>
                             <td className="px-6 py-5">
-                              <span className="text-gray-600 text-sm block max-w-xs md:max-w-sm truncate" title={result.academicProgram}>
-                                {result.academicProgram}
+                              <span className="text-gray-600 text-sm block max-w-xs md:max-w-sm truncate" title={result.branch_name}>
+                                {result.branch_name}
                               </span>
                             </td>
                             <td className="px-6 py-5 text-gray-600 text-sm font-medium">
                               {result.quota}
                             </td>
                             <td className="px-6 py-5 text-gray-900 font-semibold">
-                              {result.closingRank}
+                              {result.closing_rank}
                             </td>
                             <td className="px-6 py-5">
                               <span className={`px-3 py-1 text-xs font-bold rounded-full border ${prob.color}`}>
