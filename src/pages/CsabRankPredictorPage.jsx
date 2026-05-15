@@ -300,8 +300,12 @@ export default function CsabRankPredictorPage() {
                         <Download className="w-4 h-4" /> Export
                       </button>
                     </div>
-                      <tr className="bg-white border-b border-gray-100 uppercase text-xs tracking-wider text-gray-500 font-semibold">
-                        <th className="p-6 font-medium">Institute & Branch</th>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-white border-b border-gray-100 uppercase text-xs tracking-wider text-gray-500 font-semibold">
+                          <th className="p-6 font-medium">Institute & Branch</th>
                         <th className="p-6 font-medium">Quota / Type</th>
                         <th className="p-6 font-medium">Closing Rank</th>
                         <th className="p-6 font-medium text-right">Probability</th>
