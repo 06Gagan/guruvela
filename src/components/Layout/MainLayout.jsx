@@ -21,7 +21,8 @@ export default function MainLayout() {
       </main>
 
       <Footer />
-      <ChatWidget />
+      {/* Do not show floating ChatWidget on landing page, since it's already integrated in hero */}
+      {!isHomePage && <ChatWidget />}
     </div>
   );
 }

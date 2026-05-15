@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   BarChart2, 
@@ -11,8 +11,36 @@ import {
   Award,
   Globe 
 } from 'lucide-react';
+import { supabase } from './lib/supabase';
+import ChatInterface from './components/Chatbot/ChatInterface';
 
 export default function Landing() {
+  const [mentors, setMentors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('mentors')
+          .select('id, name, profile_image_path, branch, state')
+          .eq('active', true)
+          .order('sort_order', { ascending: true })
+          .limit(4);
+
+        if (!error && data) {
+          setMentors(data);
+        }
+      } catch (err) {
+        console.error('Error fetching mentors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMentors();
+  }, []);
+
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen font-sans">
       {/* Hero Section */}
@@ -24,14 +52,14 @@ export default function Landing() {
             <div className="w-full lg:w-1/2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-primary text-sm font-semibold mb-6">
                 <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-                Official Counselling Partner 2025
+                Official Counselling Partner 2026
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 tracking-tight leading-[1.1] mb-6">
                 Navigating <span className="text-primary">Ambition</span> <br />
-                with Clarity
+                with AI Clarity
               </h1>
               <p className="text-lg text-gray-500 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Experience premium, data-driven college admissions counseling. We empower students with AI-assisted insights, accurate predictors, and expert Ivy-League level guidance to secure their future.
+                Experience premium, data-driven college admissions counseling for 2026. Get AI-assisted insights, accurate predictors using verified 2025 cutoff data, and expert Ivy-League level guidance.
               </p>
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                 <Link
@@ -50,41 +78,13 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right Column: Dashboard Mockup */}
-            <div className="w-full lg:w-1/2 relative hidden md:block">
+            {/* Right Column: AI Chatbot Interface */}
+            <div className="w-full lg:w-1/2 relative mt-10 md:mt-0">
               {/* Decorative backgrounds */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
               
-              <div className="relative bg-white border border-gray-200 rounded-3xl p-6 shadow-2xl shadow-gray-200/50 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-primary">
-                      <BarChart2 className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-bold text-gray-900">Analytics Engine</div>
-                      <div className="text-xs text-gray-500">Live Prediction Data</div>
-                    </div>
-                  </div>
-                  <div className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-full">
-                    99.8% Accuracy
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                      <div className="w-12 h-12 bg-white rounded-lg border border-gray-200 flex items-center justify-center shadow-sm">
-                        <Map className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-                        <div className="h-3 bg-gray-100 rounded w-1/4"></div>
-                      </div>
-                      <div className="h-4 bg-blue-100 rounded w-12"></div>
-                    </div>
-                  ))}
-                </div>
+              <div className="relative bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 h-[500px] md:h-[600px] flex flex-col transform transition-transform duration-500 hover:scale-[1.01] z-20">
+                <ChatInterface />
               </div>
 
               {/* Floating element */}
@@ -192,25 +192,39 @@ export default function Landing() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { name: "Dr. Alok Verma", role: "IIT Bombay Alumni", img: "avataaars" },
-              { name: "Sarah Jenkins", role: "Admissions Coach", img: "avataaars" },
-              { name: "Rahul Sharma", role: "NIT Trichy Expert", img: "avataaars" },
-              { name: "Priya Desai", role: "Financial Aid Specialist", img: "avataaars" }
-            ].map((mentor, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <div className="aspect-[4/5] bg-gray-100 rounded-3xl mb-4 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors z-10" />
-                  <img 
-                    src={`https://api.dicebear.com/7.x/${mentor.img}/svg?seed=${mentor.name}&backgroundColor=f1f5f9`} 
-                    alt={mentor.name}
-                    className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105"
-                  />
+            {loading ? (
+              // Skeletons
+              [1, 2, 3, 4].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[4/5] bg-gray-200 rounded-3xl mb-4"></div>
+                  <div className="h-6 bg-gray-200 rounded mb-2 w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                 </div>
-                <h4 className="text-xl font-bold text-gray-900">{mentor.name}</h4>
-                <p className="text-sm font-medium text-primary mt-1">{mentor.role}</p>
+              ))
+            ) : mentors.length > 0 ? (
+              mentors.map((mentor) => (
+                <Link to="/mentors" key={mentor.id} className="group cursor-pointer block">
+                  <div className="aspect-[4/5] bg-gray-100 rounded-3xl mb-4 overflow-hidden relative border border-gray-200 shadow-sm">
+                    <div className="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors z-10" />
+                    <img 
+                      src={mentor.profile_image_path || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=f1f5f9`} 
+                      alt={mentor.name}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=f1f5f9`;
+                      }}
+                      className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <h4 className="text-xl font-bold text-gray-900">{mentor.name}</h4>
+                  <p className="text-sm font-medium text-primary mt-1">{mentor.branch || mentor.state || 'Expert Mentor'}</p>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-4 text-center text-gray-500 py-10">
+                No active mentors found right now.
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>
