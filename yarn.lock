@@ -168,10 +168,10 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@esbuild/linux-x64@0.25.4":
+"@esbuild/win32-x64@0.25.4":
   version "0.25.4"
-  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.4.tgz"
-  integrity sha512-6e0cvXwzOnVWJHq+mskP8DNSrKBr1bULBvnFLpc1KY+d+irZSgZ02TGse5FsafKS5jg2e4pbvK6TPXaF/A6+CA==
+  resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.4.tgz"
+  integrity sha512-nOT2vZNw6hJ+z43oP1SPea/G/6AbN6X+bGNhNuq8NtRHy4wsMhw765IKLNmnjek7GvjWBYQ8Q5VBoYTFg9y1UQ==
 
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.7.0"
@@ -459,15 +459,10 @@
   resolved "https://registry.npmjs.org/@react-types/shared/-/shared-3.29.1.tgz"
   integrity sha512-KtM+cDf2CXoUX439rfEhbnEdAgFZX20UP2A35ypNIawR7/PFFPjQDWyA2EnClCcW/dLWJDEPX2U8+EJff8xqmQ==
 
-"@rollup/rollup-linux-x64-gnu@4.41.0":
+"@rollup/rollup-win32-x64-msvc@4.41.0":
   version "4.41.0"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.41.0.tgz"
-  integrity sha512-XMLeKjyH8NsEDCRptf6LO8lJk23o9wvB+dJwcXMaH6ZQbbkHu2dbGIUindbMtRN6ux1xKi16iXWu6q9mu7gDhQ==
-
-"@rollup/rollup-linux-x64-musl@4.41.0":
-  version "4.41.0"
-  resolved "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.41.0.tgz"
-  integrity sha512-m/P7LycHZTvSQeXhFmgmdqEiTqSV80zn6xHaQ1JSqwCtD1YGtwEK515Qmy9DcB2HK4dOUVypQxvhVSy06cJPEg==
+  resolved "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.41.0.tgz"
+  integrity sha512-h1J+Yzjo/X+0EAvR2kIXJDuTuyT7drc+t2ALY0nIcGPbTatNOf0VWdhEA2Z4AAjv6X1NJV7SYo5oCTYRJhSlVA==
 
 "@supabase/auth-js@2.69.1":
   version "2.69.1"
@@ -1566,6 +1561,11 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+lucide-react@^1.16.0:
+  version "1.16.0"
+  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-1.16.0.tgz"
+  integrity sha512-dYwyPzb4MEKpGUmNYk3WKWPnMrHs3FKM+q94kAnJrcDIqqn1hq2xY8scaS2ovsOCM5D51ey2gaRG3PBb1vgoYQ==
+
 markdown-table@^3.0.0:
   version "3.0.4"
   resolved "https://registry.npmjs.org/markdown-table/-/markdown-table-3.0.4.tgz"
@@ -2337,7 +2337,7 @@ react-router@7.6.0:
     cookie "^1.0.1"
     set-cookie-parser "^2.6.0"
 
-"react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1", "react@^18 || ^19 || ^19.0.0-rc", react@^19.1.0, "react@>= 16 || ^19.0.0-rc", react@>=16.8.0, react@>=18:
+"react@^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0", "react@^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1", "react@^18 || ^19 || ^19.0.0-rc", react@^19.1.0, "react@>= 16 || ^19.0.0-rc", react@>=16.8.0, react@>=18:
   version "19.1.0"
   resolved "https://registry.npmjs.org/react/-/react-19.1.0.tgz"
   integrity sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==
