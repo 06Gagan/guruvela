@@ -18,6 +18,8 @@ export default function RankPredictorPage() {
   const [state, setState] = useState('');
 
   const [results, setResults] = useState([]);
+  const [filterText, setFilterText] = useState('');
+  const [visibleCount, setVisibleCount] = useState(15);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
@@ -57,6 +59,7 @@ export default function RankPredictorPage() {
         { rank, examType, category, quota, gender, isPreparatoryRank, state },
         { year: JOSAA_PREDICTION_YEAR, round: JOSAA_PREDICTION_ROUND }
       );
+      setVisibleCount(15);
       setResults(data || []);
     } catch (err) {
       setError("Failed to fetch predictions");
@@ -87,6 +90,28 @@ export default function RankPredictorPage() {
     if (prob > 50) return { label: 'Medium', color: 'bg-blue-100 text-blue-800 border-blue-200' };
     return { label: 'Low', color: 'bg-red-50 text-red-700 border-red-200' };
   };
+
+  const handleExport = () => {
+    let csvContent = "data:text/csv;charset=utf-8,\n";
+    csvContent += "Institute Name,Branch Name,Quota,Expected Closing Rank\n";
+    results.forEach(row => {
+      let institute = '"' + (row.institute_name || '').replace(/"/g, '""') + '"';
+      let branch = '"' + (row.branch_name || '').replace(/"/g, '""') + '"';
+      csvContent += `${institute},${branch},${row.quota},${row.closing_rank}\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "guruvela_predictions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filteredResults = results.filter(r => 
+    (r.institute_name || '').toLowerCase().includes(filterText.toLowerCase()) || 
+    (r.branch_name || '').toLowerCase().includes(filterText.toLowerCase())
+  );
 
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen pb-20 font-sans">
@@ -221,12 +246,15 @@ export default function RankPredictorPage() {
             <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
               <div className="p-6 md:p-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100">
                 <h2 className="text-2xl font-bold text-gray-900">Predicted Institutes</h2>
-                <div className="flex items-center gap-3">
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                    <SlidersHorizontal className="w-4 h-4" /> Filter
-                  </button>
-                  <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                    <Download className="w-4 h-4" /> Export
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <input 
+                      type="text" 
+                      placeholder="Filter institutes or branches..." 
+                      value={filterText}
+                      onChange={(e) => setFilterText(e.target.value)}
+                      className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-64"
+                    />
+                    <button onClick={handleExport} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap">
                   </button>
                 </div>
               </div>
@@ -269,7 +297,7 @@ export default function RankPredictorPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {results.slice(0, 15).map((result, idx) => {
+                      {filteredResults.slice(0, visibleCount).map((result, idx) => {
                         const prob = getProbabilityLabel(result.probability || Math.floor(Math.random() * 100)); // fallback if probability missing
                         return (
                           <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
@@ -301,10 +329,10 @@ export default function RankPredictorPage() {
                   </table>
                 )}
                 
-                {searched && results.length > 15 && (
+                {searched && filteredResults.length > visibleCount && (
                   <div className="p-6 text-center border-t border-gray-100">
-                    <button className="text-primary font-bold hover:text-primary-dark transition-colors text-sm flex items-center justify-center gap-1 mx-auto">
-                      Load More Results <ChevronRight className="w-4 h-4" />
+                    <button onClick={() => setVisibleCount(c => c + 15)} className="text-primary font-bold hover:text-primary-dark transition-colors text-sm flex items-center justify-center gap-1 mx-auto">
+                      Load More Results ({filteredResults.length - visibleCount} left) <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
                 )}

@@ -41,6 +41,9 @@ export default function Landing() {
     fetchMentors();
   }, []);
 
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const publicBucketName = 'profilepic';
+
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen font-sans">
       {/* Hero Section */}
@@ -207,11 +210,15 @@ export default function Landing() {
                   <div className="aspect-[4/5] bg-gray-100 rounded-3xl mb-4 overflow-hidden relative border border-gray-200 shadow-sm">
                     <div className="absolute inset-0 bg-gray-900/0 group-hover:bg-gray-900/10 transition-colors z-10" />
                     <img 
-                      src={mentor.profile_image_path || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=f1f5f9`} 
+                      src={
+                        mentor.profile_image_path 
+                          ? `${supabaseUrl}/storage/v1/object/public/${publicBucketName}/${mentor.profile_image_path.startsWith('/') ? mentor.profile_image_path.substring(1) : mentor.profile_image_path}` 
+                          : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=0047AB&textColor=ffffff`
+                      } 
                       alt={mentor.name}
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=f1f5f9`;
+                        e.target.src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(mentor.name)}&backgroundColor=0047AB&textColor=ffffff`;
                       }}
                       className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
                     />

@@ -364,10 +364,23 @@ export default function ChatInterface() {
 
   return (
     // Make this outer div a flex container that grows to fill available vertical space
-    <div className="w-full h-full flex flex-col p-2">
-      <div className="flex justify-end mb-2">
-        <button onClick={handleResetConversation} className="text-xs text-gray-500 hover:text-primary underline">Reset Chat</button>
+    <div className="w-full h-full flex flex-col pt-0 bg-white">
+      <div className="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50/80 mb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+            <span className="text-primary font-bold text-sm">G</span>
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm">Guruvela AI</h3>
+            <p className="text-[10px] text-green-600 font-medium flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse"></span> Online
+            </p>
+          </div>
+        </div>
+        <button onClick={handleResetConversation} className="text-xs text-gray-500 hover:text-primary transition-colors border border-gray-200 px-3 py-1.5 rounded-md bg-white shadow-sm hover:shadow">Reset Chat</button>
       </div>
+
+      <div className="px-2 flex-grow overflow-hidden flex flex-col">
       {showPredictorPromo && (
         <div className="relative bg-blue-50 border border-blue-100 p-2 mb-2 rounded-lg flex flex-col items-center text-center">
           <p className="text-xs text-gray-700 mb-2">
@@ -395,9 +408,9 @@ export default function ChatInterface() {
       {/* Make the card grow to fill space from parent (flex-1), 
         remain a flex column, and hide its own overflow.
       */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-lg border border-gray-100 shadow-inner">
+      <div className="flex-1 flex flex-col overflow-hidden bg-white/50 rounded-b-lg border-t border-gray-100">
         <div
-          className="flex-grow overflow-y-auto p-3 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent"
+          className="flex-grow overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent"
           role="log"
           aria-label="Chat messages"
           aria-live="polite"

@@ -1,4 +1,4 @@
-// src/pages/CsabRankPredictorPage.jsx
+﻿// src/pages/CsabRankPredictorPage.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
@@ -15,6 +15,8 @@ export default function CsabRankPredictorPage() {
   const [gender, setGender] = useState('Gender-Neutral');
   
   const [results, setResults] = useState([]);
+  const [filterText, setFilterText] = useState('');
+  const [visibleCount, setVisibleCount] = useState(15);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
@@ -87,6 +89,7 @@ export default function CsabRankPredictorPage() {
       if (supabaseError) {
         throw supabaseError;
       }
+      setVisibleCount(15);
       setResults(fetchedData || []);
 
     } catch (err) {
@@ -109,6 +112,28 @@ export default function CsabRankPredictorPage() {
     if (diff > 0) return { label: 'Medium', color: 'bg-blue-100 text-blue-800 border-blue-200' };
     return { label: 'Low', color: 'bg-red-50 text-red-700 border-red-200' };
   };
+
+  const handleExport = () => {
+    let csvContent = "data:text/csv;charset=utf-8,\n";
+    csvContent += "Institute Name,Branch Name,Quota,Expected Closing Rank\n";
+    results.forEach(row => {
+      let institute = '"' + (row.institute_name || '').replace(/"/g, '""') + '"';
+      let branch = '"' + (row.branch_name || '').replace(/"/g, '""') + '"';
+      csvContent += `${institute},${branch},${row.quota},${row.closing_rank}\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "guruvela_csab_predictions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const filteredResults = results.filter(r => 
+    (r.institute_name || '').toLowerCase().includes(filterText.toLowerCase()) || 
+    (r.branch_name || '').toLowerCase().includes(filterText.toLowerCase())
+  );
 
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen pb-20 font-sans">
@@ -263,11 +288,18 @@ export default function CsabRankPredictorPage() {
                     <h3 className="text-2xl font-bold text-gray-900">Predicted Institutes (CSAB)</h3>
                     <p className="text-gray-500 mt-1">Found {results.length} prospective branches based on CSAB {CSAB_PREDICTION_YEAR}</p>
                   </div>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                      <input 
+                        type="text" 
+                        placeholder="Filter institutes or branches..." 
+                        value={filterText}
+                        onChange={(e) => setFilterText(e.target.value)}
+                        className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-64"
+                      />
+                      <button onClick={handleExport} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap">
+                        <Download className="w-4 h-4" /> Export
+                      </button>
+                    </div>
                       <tr className="bg-white border-b border-gray-100 uppercase text-xs tracking-wider text-gray-500 font-semibold">
                         <th className="p-6 font-medium">Institute & Branch</th>
                         <th className="p-6 font-medium">Quota / Type</th>
@@ -276,7 +308,7 @@ export default function CsabRankPredictorPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {results.map((item, index) => {
+                      {filteredResults.slice(0, visibleCount).map((item, index) => {
                         const prob = getProbabilityLabel(item.closing_rank, parseInt(rank));
                         return (
                           <tr key={item.id || index} className="hover:bg-gray-50 transition-colors group">
@@ -306,9 +338,16 @@ export default function CsabRankPredictorPage() {
                       })}
                     </tbody>
                   </table>
+                  </div>
+                  {searched && filteredResults.length > visibleCount && (
+                    <div className="p-6 text-center border-t border-gray-100">
+                      <button onClick={() => setVisibleCount(c => c + 15)} className="text-primary font-bold hover:text-primary-dark transition-colors text-sm flex items-center justify-center gap-1 mx-auto">
+                        Load More Results ({filteredResults.length - visibleCount} left) <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>
