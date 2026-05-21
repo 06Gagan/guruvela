@@ -255,7 +255,9 @@ export default function RankPredictorPage() {
                       className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 w-full sm:w-64"
                     />
                     <button onClick={handleExport} className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-2 whitespace-nowrap">
-                  </button>
+                      <Download className="w-4 h-4" />
+                      Download
+                    </button>
                 </div>
               </div>
 
@@ -298,7 +300,7 @@ export default function RankPredictorPage() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {filteredResults.slice(0, visibleCount).map((result, idx) => {
-                        const prob = getProbabilityLabel(result.probability || Math.floor(Math.random() * 100)); // fallback if probability missing
+                        const prob = getProbabilityLabel(result.probability || 0); // Use 0 as fallback if missing
                         return (
                           <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
                             <td className="px-6 py-5">
