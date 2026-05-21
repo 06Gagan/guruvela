@@ -45,7 +45,13 @@ export async function fetchCollegePredictions({
   }
 
   query = query.eq('is_preparatory', isPreparatoryRank);
-  query = query.gte('closing_rank', userRankInt);
+
+  // To allow for "reach" colleges (Low/Medium probability), we include colleges
+  // where the closing rank is up to 500 ranks better than the user's rank.
+  const minClosingRank = Math.max(1, userRankInt - 500);
+  query = query.gte('closing_rank', minClosingRank);
+
+  // Order by closing rank to get colleges starting from the most ambitious
   query = query.order('closing_rank', { ascending: true }).limit(100);
 
   const { data, error } = await query;
@@ -53,6 +59,28 @@ export async function fetchCollegePredictions({
     throw error;
   }
 
-  const filtered = (data || []).filter(item => !/architecture/i.test(item.branch_name));
+  const filtered = (data || []).filter(item => !/architecture/i.test(item.branch_name)).map(item => {
+    const diff = item.closing_rank - userRankInt;
+    let probability;
+
+    // High probability: User rank is better by 200 or more
+    if (diff >= 200) {
+      probability = 95;
+    }
+    // Medium probability: User rank is close (between -50 and 200)
+    else if (diff >= -50 && diff < 200) {
+      probability = 75;
+    }
+    // Low probability: User rank is worse by more than 50
+    else {
+      probability = 30;
+    }
+
+    return {
+      ...item,
+      probability
+    };
+  });
+
   return filtered;
 }
