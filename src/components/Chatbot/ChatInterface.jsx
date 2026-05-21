@@ -426,23 +426,24 @@ export default function ChatInterface() {
                     ? 'bg-primary text-white hover:shadow-md'
                     : 'bg-gray-50 text-gray-800 hover:shadow-md border border-gray-100'}`}
               >
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    // eslint-disable-next-line no-unused-vars
-                    a: ({ node, ...props }) => (
-                      <a
-                        {...props}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-accent underline"
-                      />
-                    )
-                  }}
-                  className="whitespace-pre-wrap leading-relaxed"
-                >
-                  {msg.content}
-                </ReactMarkdown>
+                <div className="whitespace-pre-wrap leading-relaxed">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      // eslint-disable-next-line no-unused-vars
+                      a: ({ node, ...props }) => (
+                        <a
+                          {...props}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-accent underline"
+                        />
+                      )
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
 
                 {msg.type === 'bot' && msg.relatedContent && (
                   <Link
