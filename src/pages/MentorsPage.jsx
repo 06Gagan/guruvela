@@ -10,12 +10,11 @@ export default function MentorsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const actualGeneralGroupLink = "https://chat.whatsapp.com/ILaZUl502MSJI2zF8B3iGw";
+  const actualGeneralGroupLink = "https://chat.whatsapp.com/K8ZQUXHpJBwKgeTjuP7qfE";
   const actualPremiumGuidanceLink = "https://docs.google.com/forms/d/e/1FAIpQLSdh6syRNkLn8RzrUTf7rSBO8wXiIoxZ98SRLdm014_3lhv8AQ/viewform";
 
-  const GENERAL_GROUP_LINK_PLACEHOLDER = "YOUR_GENERAL_GROUP_LINK_HERE";
-  const PREMIUM_GUIDANCE_LINK_PLACEHOLDER = "YOUR_PREMIUM_GUIDANCE_LINK_HERE";
-
+  const isGeneralLinkEffectivelyPlaceholder = false;
+  const isPremiumLinkEffectivelyPlaceholder = false;
 
   useEffect(() => {
     document.title = 'Mentors | Guruvela';
@@ -69,10 +68,6 @@ export default function MentorsPage() {
       </div>
     );
   }
-
-  const isGeneralLinkEffectivelyPlaceholder = actualGeneralGroupLink === GENERAL_GROUP_LINK_PLACEHOLDER;
-  const isPremiumLinkEffectivelyPlaceholder = actualPremiumGuidanceLink === PREMIUM_GUIDANCE_LINK_PLACEHOLDER;
-
 
   return (
     <div className="w-full bg-[#f8fafc] min-h-screen pb-20 font-sans">

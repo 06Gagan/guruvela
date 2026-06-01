@@ -19,8 +19,9 @@ export default function MentorCard({ mentor, fallbackGroupLink }) {
     ? `${supabaseUrl}/storage/v1/object/public/${publicBucketName}/${profile_image_path.startsWith('/') ? profile_image_path.substring(1) : profile_image_path}`
     : 'https://via.placeholder.com/150';
 
-  const actualGroupLink = group_guidance_link || fallbackGroupLink;
-  const isGroupLinkPlaceholder = actualGroupLink === "YOUR_FALLBACK_WHATSAPP_GROUP_LINK_HERE" || !actualGroupLink;
+  // Use the common WhatsApp group link for all mentors
+  const actualGroupLink = "https://chat.whatsapp.com/K8ZQUXHpJBwKgeTjuP7qfE";
+  const isGroupLinkPlaceholder = false;
 
   return (
     <div className="bg-white rounded-3xl border border-gray-200 shadow-sm flex flex-col pt-8 px-6 pb-6 transform transition-all duration-300 hover:shadow-lg hover:-translate-y-1 h-full">
