@@ -69,33 +69,13 @@ export default function MentorCard({ mentor, fallbackGroupLink }) {
       </div>
 
       <div className="mt-auto pt-4 space-y-3 border-t border-gray-100">
-        {google_form_link_1_to_1 ? (
-          <a
-            href={google_form_link_1_to_1}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full bg-white border-2 border-primary text-primary hover:bg-blue-50 font-bold py-2.5 rounded-xl block text-center transition-colors text-sm"
-          >
-            1-to-1 Mentorship
-          </a>
-        ) : (
-          <button
-            className="w-full bg-gray-50 border-2 border-gray-200 text-gray-400 font-bold py-2.5 rounded-xl block text-center cursor-not-allowed text-sm"
-            disabled
-          >
-            1-to-1 (Unavailable)
-          </button>
-        )}
-
         <a
-          href={isGroupLinkPlaceholder ? "#" : actualGroupLink}
+          href={actualGroupLink}
           target="_blank"
           rel="noopener noreferrer"
-          className={`w-full font-bold py-3 rounded-xl block text-center transition-all text-sm ${isGroupLinkPlaceholder ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' : 'bg-primary text-white hover:bg-primary-dark shadow-md shadow-primary/20'}`}
-          aria-disabled={isGroupLinkPlaceholder}
-          onClick={(e) => isGroupLinkPlaceholder && e.preventDefault()}
+          className="w-full font-bold py-3 rounded-xl block text-center transition-all text-sm bg-primary text-white hover:bg-primary-dark shadow-md shadow-primary/20"
         >
-          Join Group Guidance
+          Join WhatsApp Community
         </a>
       </div>
     </div>

@@ -123,30 +123,14 @@ export default function MentorsPage() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
             <a
-              href={isGeneralLinkEffectivelyPlaceholder ? "#" : actualGeneralGroupLink}
+              href={actualGeneralGroupLink}
               target="_blank"
               rel="noopener noreferrer"
-              className={`px-8 py-4 rounded-xl font-bold transition-all shadow-sm ${isGeneralLinkEffectivelyPlaceholder ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' : 'bg-primary text-white hover:bg-primary-dark hover:shadow-md'}`}
-              aria-disabled={isGeneralLinkEffectivelyPlaceholder}
-              onClick={(e) => isGeneralLinkEffectivelyPlaceholder && e.preventDefault()}
+              className="px-8 py-4 rounded-xl font-bold transition-all shadow-sm bg-primary text-white hover:bg-primary-dark hover:shadow-md"
             >
-              Join Community Group
-            </a>
-            
-            <a
-              href={isPremiumLinkEffectivelyPlaceholder ? "#" : actualPremiumGuidanceLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`px-8 py-4 rounded-xl font-bold transition-all ${isPremiumLinkEffectivelyPlaceholder ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200' : 'bg-white text-primary border-2 border-primary hover:bg-blue-50'}`}
-              aria-disabled={isPremiumLinkEffectivelyPlaceholder}
-              onClick={(e) => isPremiumLinkEffectivelyPlaceholder && e.preventDefault()}
-            >
-              Explore Premium Guidance
+              Join WhatsApp Community
             </a>
           </div>
-          <p className="text-sm text-gray-400 mt-6 relative z-10">
-             Need more dedicated support? The Premium Guidance offers early WhatsApp replies and direct calls.
-          </p>
         </div>
       </div>
     </div>
